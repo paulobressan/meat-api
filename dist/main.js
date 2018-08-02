@@ -1,34 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-//importando o restify para criar o servidor
-const restify = require("restify");
-//Configurando o servidor, nome e versão
-const server = restify.createServer({
-    name: 'meat-api',
-    version: '1.0.0'
-});
-//Configurando um plugin para capturar os valores passado na url
-server.use(restify.plugins.queryParser());
-//criando um metodo get, uma rota valida
-server.get('/info', (req, res, next) => {
-    //criando uma resposta em json para quem o chamou
-    res.json({
-        //capturando dados do client
-        browser: req.userAgent(),
-        //capturando o metodo http tomado para realizar a requisição
-        Method: req.method,
-        //capturando a url
-        url: req.url,
-        //camminho completo
-        path: req.path(),
-        //parametros passados
-        params: req.query
-    });
-    //Sempre que terminarmos o codigo no callback da rota, 
-    // chamar o next para indicar que o metodo terminou
-    return next();
-});
-//Esctuando o servidor na porta 3000
-server.listen(3000, () => {
-    console.log('API is running on http://localhost:3000');
+const server_1 = require("./server/server");
+//importando instancias de rotas e passando como parametro para o boostrap do servidor
+//nele criamos um roteador que passar por cada rota importada e passada para o bootstrap
+//e assim declarando rota por rota
+const users_router_1 = require("./users/users.router");
+//criando uma instancia de server
+const server = new server_1.Server();
+//Chamar o boostrap que inicializa o servidor e passamos como parametro as rotas
+server.bootstrap([users_router_1.usersRouters]).then(server => {
+    //Se tudo der certo, vamos logar no terminar a porta que esta rodando o servidor.
+    console.log('Servidor rodando ', server.application.address());
+}).catch(err => {
+    //Se ocorrer erro, vamos logar que houve erro e o erro
+    console.log('Erro no servidor');
+    console.log(err);
+    process.exit(1);
 });
