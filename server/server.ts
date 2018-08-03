@@ -4,10 +4,21 @@ import * as restify from 'restify';
 import {environment} from '../common/environment';
 //importando classe abstrata de rotas
 import {Router} from '../common/router';
-
+//importando o mongoose
+import * as mongoose from 'mongoose';
 
 //Configurando classe que vai iniciar o servidor
 export class Server{
+
+    //metodo que inicializa a conexão com mongo
+    initializeDb(): any {
+        //O mongo tem que ser configurado a forma assincrona que vai ser utilizado, como primisse
+        (<any>mongoose).Promise = global.Promise;
+        //criando conexão com o mongo pegando a url statica no environment
+        return mongoose.connect(environment.db.url, {
+            useMongoClient: true
+        });
+    }
 
     //propriedade que vai armazenar o servidor de aplicação, com ela podemso acessar o servidor em outras classe
     application: restify.Server;
@@ -55,6 +66,8 @@ export class Server{
     //criando um metodo que vai executar o servidor e retornar uma promessa que se tudo der certo
     //retornara uma referencia da classe Server
     bootstrap(routers: Router[] = []): Promise<Server>{
-        return this.initRoutes(routers).then(() => this)
+        //iniciar rotas e servidor se a conexão com o banco for sucedida
+        return this.initializeDb().then(() =>
+         this.initRoutes(routers).then(() => this));
     }
 }

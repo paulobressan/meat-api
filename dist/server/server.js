@@ -4,8 +4,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const restify = require("restify");
 //importando as configurações estaticas
 const environment_1 = require("../common/environment");
+//importando o mongoose
+const mongoose = require("mongoose");
 //Configurando classe que vai iniciar o servidor
 class Server {
+    //metodo que inicializa a conexão com mongo
+    initializeDb() {
+        //O mongo tem que ser configurado a forma assincrona que vai ser utilizado, como primisse
+        mongoose.Promise = global.Promise;
+        //criando conexão com o mongo pegando a url statica no environment
+        return mongoose.connect(environment_1.environment.db.url, {
+            useMongoClient: true
+        });
+    }
     //metodo que vai iniciar o servidor
     initRoutes(routers) {
         //Retornando uma promessa que o servidor vai ser iniciado
@@ -45,7 +56,8 @@ class Server {
     //criando um metodo que vai executar o servidor e retornar uma promessa que se tudo der certo
     //retornara uma referencia da classe Server
     bootstrap(routers = []) {
-        return this.initRoutes(routers).then(() => this);
+        //iniciar rotas e servidor se a conexão com o banco for sucedida
+        return this.initializeDb().then(() => this.initRoutes(routers).then(() => this));
     }
 }
 exports.Server = Server;

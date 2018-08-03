@@ -17,9 +17,11 @@
   },
   "homepage": "https://github.com/paulobressan/meat-api#readme",
   "dependencies": {
+    "mongoose": "^5.2.6",
     "restify": "^7.2.1"
   },
   "devDependencies": {
+    "@types/mongoose": "^5.2.3",
     "@types/restify": "^7.2.3"
   }
 }
