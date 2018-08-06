@@ -22,7 +22,7 @@ export class Server{
 
     //propriedade que vai armazenar o servidor de aplicação, com ela podemso acessar o servidor em outras classe
     application: restify.Server;
-
+    
     //metodo que vai iniciar o servidor
     initRoutes(routers: Router[]) : Promise<any>{
         //Retornando uma promessa que o servidor vai ser iniciado
@@ -36,6 +36,9 @@ export class Server{
 
                 //Configurando um plugin para capturar os valores passado na url
                 this.application.use(restify.plugins.queryParser());
+
+                //Configurando um plugin para converter o body em objetos json
+                this.application.use(restify.plugins.bodyParser());
 
                 //Adicionando arquivos de rotas
                 //percorrendo o array de rotas recebido pelo bootstrap e passada para o initRoutes

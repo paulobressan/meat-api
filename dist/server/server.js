@@ -29,6 +29,8 @@ class Server {
                 });
                 //Configurando um plugin para capturar os valores passado na url
                 this.application.use(restify.plugins.queryParser());
+                //Configurando um plugin para converter o body em objetos json
+                this.application.use(restify.plugins.bodyParser());
                 //Adicionando arquivos de rotas
                 //percorrendo o array de rotas recebido pelo bootstrap e passada para o initRoutes
                 //aplica-las na aplicação, as rotas herda de Route que é abstrata e tem o metodo abstrato applyRoute
