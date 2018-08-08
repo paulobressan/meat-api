@@ -6,12 +6,14 @@ import {environment} from '../common/environment';
 import {Router} from '../common/router';
 //importando o mongoose
 import * as mongoose from 'mongoose';
+//importando função de conversão do tipo do metodo patch
+import {mergePatchBodyParser} from './merge-patch.parser';
 
 //Configurando classe que vai iniciar o servidor
 export class Server{
 
     //metodo que inicializa a conexão com mongo
-    initializeDb(): any {
+    initializeDb(): Promise<any> {
         //O mongo tem que ser configurado a forma assincrona que vai ser utilizado, como primisse
         (<any>mongoose).Promise = global.Promise;
         //criando conexão com o mongo pegando a url statica no environment
@@ -39,6 +41,9 @@ export class Server{
 
                 //Configurando um plugin para converter o body em objetos json
                 this.application.use(restify.plugins.bodyParser());
+
+                //Usando a função de conversão de merge-patch+json criada e importada 
+                this.application.use(mergePatchBodyParser);
 
                 //Adicionando arquivos de rotas
                 //percorrendo o array de rotas recebido pelo bootstrap e passada para o initRoutes

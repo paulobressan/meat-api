@@ -67,6 +67,28 @@ class UsersRouter extends router_1.Router {
                 return next();
             });
         });
+        //O tipo de dados enviado para o patch tem que ser merge- seguindo as boas praticas. Para isso 
+        //o patch vai alterar somente a prop que enviarmos para ele. Ele é melhor que o put no caso de
+        //alteração de um unico valor ou poucos valores porque não temos que forçar o client pegar o objeto atualizado
+        //e enviar.
+        application.patch('/users/:id', (req, resp, next) => {
+            //O findByIdUpdate retorna na promise o documento desatualizado e por isso temos que
+            //criar uma options que retornara o documento atualizado
+            const options = {
+                new: true
+            };
+            //alterando parcialmente um documento, no put foi feito manualmente a atualização do 
+            //documento, o findByIdAndUpdate é uma forma mais produtiva onde ele ja busca o documento
+            // que vai ser alterado
+            users_model_1.User.findByIdAndUpdate(req.params.id, req.body, options).then(user => {
+                if (user) {
+                    resp.json(user);
+                    return next();
+                }
+                resp.send(404);
+                return next();
+            });
+        });
     }
 }
 //quem chamar essa classe vai receber uma instancia pronta para utilizar

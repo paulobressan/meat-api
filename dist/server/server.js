@@ -6,6 +6,8 @@ const restify = require("restify");
 const environment_1 = require("../common/environment");
 //importando o mongoose
 const mongoose = require("mongoose");
+//importando função de conversão do tipo do metodo patch
+const merge_patch_parser_1 = require("./merge-patch.parser");
 //Configurando classe que vai iniciar o servidor
 class Server {
     //metodo que inicializa a conexão com mongo
@@ -31,6 +33,8 @@ class Server {
                 this.application.use(restify.plugins.queryParser());
                 //Configurando um plugin para converter o body em objetos json
                 this.application.use(restify.plugins.bodyParser());
+                //Usando a função de conversão de merge-patch+json criada e importada 
+                this.application.use(merge_patch_parser_1.mergePatchBodyParser);
                 //Adicionando arquivos de rotas
                 //percorrendo o array de rotas recebido pelo bootstrap e passada para o initRoutes
                 //aplica-las na aplicação, as rotas herda de Route que é abstrata e tem o metodo abstrato applyRoute
