@@ -9,13 +9,14 @@ exports.mergePatchBodyParser = (req, resp, next) => {
     //somente nos metodo patch
     if (req.getContentType() === mpContentType && req.method === "PATCH") {
         //se quisermos utilizar o body antes de ser convertido, podemos guarda-lo em outra prop
-        // (<any>req).rawBody = req.body;
+        req.rawBody = req.body;
         //se for verdadeiro, vamos atribuir ao body o proprio body convertido em json
         try {
             req.body = JSON.parse(req.body);
         }
         catch (e) {
-            return next(new Error(`Invalid content. ${e}`));
+            return next(new Error(`Invalid content. ${e.message}`));
         }
     }
+    return next();
 };

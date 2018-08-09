@@ -7,21 +7,16 @@ import { User } from '../users/users.model';
 class UsersRouter extends Router {
     applyRoutes(application: restify.Server) {
         application.get('/users', (req, resp, next) => {
-            User.find().then(users => {
-                resp.json(users);
-                return next();
-            })
+            User.find().then(
+                //metodo herdado de Router
+                this.render(resp, next)
+            )
         });
 
         application.get('/users/:id', (req, resp, next) => {
-            User.findById(req.params.id).then(user => {
-                if (user) {
-                    resp.json(user);
-                    return next();
-                }
-                resp.send(404);
-                return next();
-            })
+            User.findById(req.params.id).then(
+                this.render(resp, next)
+            )
         });
 
         //criando um usuário via post
@@ -29,21 +24,15 @@ class UsersRouter extends Router {
             //Criando um novo documento do schema de User
             //podemos passar direto o req.body desque estamos utilizando o plugin body parser
             let user = new User(req.body);
-            user.save().then(user => {
-                resp.json(user);
-                return next();
-            })
+            user.save().then(
+                this.render(resp, next)
+            )
         });
 
         application.get('/users/byName/:name', (req, resp, next) => {
-            User.find({ name: req.params.name }).then(user => {
-                if (user) {
-                    resp.json(user);
-                    return next();
-                }
-                resp.json(404);
-                return next();
-            })
+            User.find({ name: req.params.name }).then(
+                this.render(resp, next)
+            )
         });
 
         //realizando um put
@@ -65,18 +54,16 @@ class UsersRouter extends Router {
                         resp.send(404);
                     }
                 })
-                .then(user => {
-                    resp.json(user);
-                    return next();
-                })
-
+                .then(
+                    this.render(resp, next)
+                )
         });
 
         //O tipo de dados enviado para o patch tem que ser merge- seguindo as boas praticas. Para isso 
         //o patch vai alterar somente a prop que enviarmos para ele. Ele é melhor que o put no caso de
         //alteração de um unico valor ou poucos valores porque não temos que forçar o client pegar o objeto atualizado
         //e enviar.
-        application.patch('/users/:id',  (req, resp, next) =>{
+        application.patch('/users/:id', (req, resp, next) => {
             //O findByIdUpdate retorna na promise o documento desatualizado e por isso temos que
             //criar uma options que retornara o documento atualizado
             const options = {
@@ -85,14 +72,26 @@ class UsersRouter extends Router {
             //alterando parcialmente um documento, no put foi feito manualmente a atualização do 
             //documento, o findByIdAndUpdate é uma forma mais produtiva onde ele ja busca o documento
             // que vai ser alterado
-            User.findByIdAndUpdate(req.params.id, req.body, options).then(user => {
-                if(user){
-                    resp.json(user);
+            User.findByIdAndUpdate(req.params.id, req.body, options)
+                .then(
+                    this.render(resp, next)
+                )
+        });
+
+        application.del('/users/:id', (req, resp, next) => {
+            //como não queremos retornar nada depois que remover, podemos simplesmente usar o metodo remove
+            //Se for preciso retorna podemos utilizar o metodo findByIdAndRemove
+            User.remove({ _id: req.params.id })
+                .exec()
+                .then((result: any) => {
+                    //Se o algum documento foi afetado
+                    if (result.n)
+                        resp.send(204);
+                    else
+                        //Se não é porque não encontrou nenhum documento com o id passado
+                        resp.send(404);
                     return next();
-                }
-                resp.send(404);
-                return next();
-            })
+                })
         });
     }
 }
