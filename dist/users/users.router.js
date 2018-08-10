@@ -5,24 +5,43 @@ const router_1 = require("../common/router");
 const users_model_1 = require("../users/users.model");
 //classe que define rotas de usuarios
 class UsersRouter extends router_1.Router {
+    constructor() {
+        super();
+        //capturando eventos da classe pai antes que o metodo de retorno das rotas
+        //retorna os objetos para o cliente, assim podemos manipular o valor antes
+        //que ele retorne
+        this.on('beforeRender', document => {
+            document.password = undefined;
+            //temos tambem
+            //delete document.password;
+        });
+    }
     applyRoutes(application) {
         application.get('/users', (req, resp, next) => {
-            users_model_1.User.find().then(
+            users_model_1.User.find()
+                .then(
             //metodo herdado de Router
-            this.render(resp, next));
+            this.render(resp, next)).catch(next);
+            // //OU
+            // .catch(err => {
+            //     next(err)
+            // })
         });
         application.get('/users/:id', (req, resp, next) => {
-            users_model_1.User.findById(req.params.id).then(this.render(resp, next));
+            users_model_1.User.findById(req.params.id)
+                .then(this.render(resp, next)).catch(next);
         });
         //criando um usuário via post
         application.post('/users', (req, resp, next) => {
             //Criando um novo documento do schema de User
             //podemos passar direto o req.body desque estamos utilizando o plugin body parser
             let user = new users_model_1.User(req.body);
-            user.save().then(this.render(resp, next));
+            user.save()
+                .then(this.render(resp, next));
         });
         application.get('/users/byName/:name', (req, resp, next) => {
-            users_model_1.User.find({ name: req.params.name }).then(this.render(resp, next));
+            users_model_1.User.find({ name: req.params.name })
+                .then(this.render(resp, next));
         });
         //realizando um put
         //o id do documento é imutavel depois de ser criado, porem podemos definir o id antes de ser criado

@@ -5,18 +5,36 @@ import { User } from '../users/users.model';
 
 //classe que define rotas de usuarios
 class UsersRouter extends Router {
+    constructor() {
+        super()
+        //capturando eventos da classe pai antes que o metodo de retorno das rotas
+        //retorna os objetos para o cliente, assim podemos manipular o valor antes
+        //que ele retorne
+        this.on('beforeRender', document => {
+            document.password = undefined;
+            //temos tambem
+            //delete document.password;
+        })
+    }
+
     applyRoutes(application: restify.Server) {
         application.get('/users', (req, resp, next) => {
-            User.find().then(
-                //metodo herdado de Router
-                this.render(resp, next)
-            )
+            User.find()
+                .then(
+                    //metodo herdado de Router
+                    this.render(resp, next)
+                ).catch(next)
+            // //OU
+            // .catch(err => {
+            //     next(err)
+            // })
         });
 
         application.get('/users/:id', (req, resp, next) => {
-            User.findById(req.params.id).then(
-                this.render(resp, next)
-            )
+            User.findById(req.params.id)
+                .then(
+                    this.render(resp, next)
+                ).catch(next)
         });
 
         //criando um usuário via post
@@ -24,15 +42,17 @@ class UsersRouter extends Router {
             //Criando um novo documento do schema de User
             //podemos passar direto o req.body desque estamos utilizando o plugin body parser
             let user = new User(req.body);
-            user.save().then(
-                this.render(resp, next)
-            )
+            user.save()
+                .then(
+                    this.render(resp, next)
+                )
         });
 
         application.get('/users/byName/:name', (req, resp, next) => {
-            User.find({ name: req.params.name }).then(
-                this.render(resp, next)
-            )
+            User.find({ name: req.params.name })
+                .then(
+                    this.render(resp, next)
+                )
         });
 
         //realizando um put
