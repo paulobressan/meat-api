@@ -37,11 +37,11 @@ class UsersRouter extends router_1.Router {
             //podemos passar direto o req.body desque estamos utilizando o plugin body parser
             let user = new users_model_1.User(req.body);
             user.save()
-                .then(this.render(resp, next));
+                .then(this.render(resp, next)).catch(next);
         });
         application.get('/users/byName/:name', (req, resp, next) => {
             users_model_1.User.find({ name: req.params.name })
-                .then(this.render(resp, next));
+                .then(this.render(resp, next)).catch(next);
         });
         //realizando um put
         //o id do documento é imutavel depois de ser criado, porem podemos definir o id antes de ser criado
@@ -63,7 +63,7 @@ class UsersRouter extends router_1.Router {
                     resp.send(404);
                 }
             })
-                .then(this.render(resp, next));
+                .then(this.render(resp, next)).catch(next);
         });
         //O tipo de dados enviado para o patch tem que ser merge- seguindo as boas praticas. Para isso 
         //o patch vai alterar somente a prop que enviarmos para ele. Ele é melhor que o put no caso de
@@ -79,7 +79,7 @@ class UsersRouter extends router_1.Router {
             //documento, o findByIdAndUpdate é uma forma mais produtiva onde ele ja busca o documento
             // que vai ser alterado
             users_model_1.User.findByIdAndUpdate(req.params.id, req.body, options)
-                .then(this.render(resp, next));
+                .then(this.render(resp, next)).catch(next);
         });
         application.del('/users/:id', (req, resp, next) => {
             //como não queremos retornar nada depois que remover, podemos simplesmente usar o metodo remove
@@ -94,7 +94,7 @@ class UsersRouter extends router_1.Router {
                     //Se não é porque não encontrou nenhum documento com o id passado
                     resp.send(404);
                 return next();
-            });
+            }).catch(next);
         });
     }
 }

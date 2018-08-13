@@ -45,14 +45,14 @@ class UsersRouter extends Router {
             user.save()
                 .then(
                     this.render(resp, next)
-                )
+                ).catch(next)
         });
 
         application.get('/users/byName/:name', (req, resp, next) => {
             User.find({ name: req.params.name })
                 .then(
                     this.render(resp, next)
-                )
+                ).catch(next)
         });
 
         //realizando um put
@@ -76,7 +76,7 @@ class UsersRouter extends Router {
                 })
                 .then(
                     this.render(resp, next)
-                )
+                ).catch(next)
         });
 
         //O tipo de dados enviado para o patch tem que ser merge- seguindo as boas praticas. Para isso 
@@ -95,7 +95,7 @@ class UsersRouter extends Router {
             User.findByIdAndUpdate(req.params.id, req.body, options)
                 .then(
                     this.render(resp, next)
-                )
+                ).catch(next)
         });
 
         application.del('/users/:id', (req, resp, next) => {
@@ -111,7 +111,7 @@ class UsersRouter extends Router {
                         //Se não é porque não encontrou nenhum documento com o id passado
                         resp.send(404);
                     return next();
-                })
+                }).catch(next)
         });
     }
 }

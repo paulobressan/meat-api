@@ -8,6 +8,9 @@ import {Router} from '../common/router';
 import * as mongoose from 'mongoose';
 //importando função de conversão do tipo do metodo patch
 import {mergePatchBodyParser} from './merge-patch.parser';
+//arquivo de erro
+import {handleError} from './error.handler';
+
 
 //Configurando classe que vai iniciar o servidor
 export class Server{
@@ -59,6 +62,9 @@ export class Server{
                     //se tudoder certo a promisse retorna o servidor pronto e configurado.
                     resolve(this.application);
                 });
+
+                //criando um evento para que ele fique escutando os erros da aplicação se houver vai ser chamado o callback handleErro criado para retornar um json
+                this.application.on('restifyError',  handleError);
 
                 //Para verificar se houve error ao escutar o servidor em algumar porta, é necessario se inscrever no servidor
                 //e criar um evento de error para escutar se houver algum erro

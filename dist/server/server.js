@@ -8,6 +8,8 @@ const environment_1 = require("../common/environment");
 const mongoose = require("mongoose");
 //importando função de conversão do tipo do metodo patch
 const merge_patch_parser_1 = require("./merge-patch.parser");
+//arquivo de erro
+const error_handler_1 = require("./error.handler");
 //Configurando classe que vai iniciar o servidor
 class Server {
     //metodo que inicializa a conexão com mongo
@@ -48,6 +50,8 @@ class Server {
                     //se tudoder certo a promisse retorna o servidor pronto e configurado.
                     resolve(this.application);
                 });
+                //criando um evento para que ele fique escutando os erros da aplicação se houver vai ser chamado o callback handleErro criado para retornar um json
+                this.application.on('restifyError', error_handler_1.handleError);
                 //Para verificar se houve error ao escutar o servidor em algumar porta, é necessario se inscrever no servidor
                 //e criar um evento de error para escutar se houver algum erro
                 // this.application.on('error', (err)=>{
