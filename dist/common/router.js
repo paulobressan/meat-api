@@ -2,6 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 //o modulo padrão do node, ele disponibiliza metodos de emitir eventos
 const events_1 = require("events");
+//gerenciado de erros do restify
+const restify_errors_1 = require("restify-errors");
 //Essa classe abstrata é criada para tornar pai das rotas e para que no arquivo server podemos
 //criar um for e percorrer cada rota declarando-a
 class Router extends events_1.EventEmitter {
@@ -16,7 +18,7 @@ class Router extends events_1.EventEmitter {
                 response.json(document);
             }
             else
-                response.send(404);
+                throw new restify_errors_1.NotFoundError('Documento não encontrado');
             return next();
         };
     }

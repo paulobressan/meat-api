@@ -2,6 +2,8 @@ import * as restify from 'restify';
 import { Router } from '../common/router';
 //importando o model de usuarios
 import { User } from '../users/users.model';
+//gerenciado de erros do restify
+import { NotFoundError } from 'restify-errors';
 
 //classe que define rotas de usuarios
 class UsersRouter extends Router {
@@ -71,7 +73,7 @@ class UsersRouter extends Router {
                         return User.findById(req.params.id);
                     } else {
                         //Se não aplicar a alteração no documento é porque o documento não existe.
-                        resp.send(404);
+                        throw new NotFoundError('Documento não encontrado');
                     }
                 })
                 .then(
@@ -106,10 +108,10 @@ class UsersRouter extends Router {
                 .then((result: any) => {
                     //Se o algum documento foi afetado
                     if (result.n)
-                        resp.send(204);
+                        throw new NotFoundError('Documento não encontrado');
                     else
                         //Se não é porque não encontrou nenhum documento com o id passado
-                        resp.send(404);
+                        throw new NotFoundError('Documento não encontrado');
                     return next();
                 }).catch(next)
         });

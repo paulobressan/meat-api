@@ -1,4 +1,5 @@
 import * as restify from 'restify';
+import {BadRequestError} from 'restify-errors';
 
 //criando um arquivo para utilizar um novo formato aceito de requisição
 // no caso vai ser utilizado no patch, quando o cliente for enviar a requisição ele tem que enviar com
@@ -15,7 +16,8 @@ export const mergePatchBodyParser = (req: restify.Request, resp: restify.Respons
         try {
             req.body = JSON.parse(req.body);
         } catch (e) {
-            return next(new Error(`Invalid content. ${e.message}`))
+            //retornando para o cliente um badRequest gerenciado pelo restify errors
+            return next(new BadRequestError(`Invalid content. ${e.message}`))
         }
     }
     return next();

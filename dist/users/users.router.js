@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const router_1 = require("../common/router");
 //importando o model de usuarios
 const users_model_1 = require("../users/users.model");
+//gerenciado de erros do restify
+const restify_errors_1 = require("restify-errors");
 //classe que define rotas de usuarios
 class UsersRouter extends router_1.Router {
     constructor() {
@@ -60,7 +62,7 @@ class UsersRouter extends router_1.Router {
                 }
                 else {
                     //Se não aplicar a alteração no documento é porque o documento não existe.
-                    resp.send(404);
+                    throw new restify_errors_1.NotFoundError('Documento não encontrado');
                 }
             })
                 .then(this.render(resp, next)).catch(next);
@@ -89,10 +91,10 @@ class UsersRouter extends router_1.Router {
                 .then((result) => {
                 //Se o algum documento foi afetado
                 if (result.n)
-                    resp.send(204);
+                    throw new restify_errors_1.NotFoundError('Documento não encontrado');
                 else
                     //Se não é porque não encontrou nenhum documento com o id passado
-                    resp.send(404);
+                    throw new restify_errors_1.NotFoundError('Documento não encontrado');
                 return next();
             }).catch(next);
         });

@@ -6,17 +6,34 @@ export const handleError = (req: restify.Request, resp: restify.Response, err, d
     //O restify busca uma prop toJSON para tratar o erros nela, portanto vamos subscreve-la
     err.toJSON = () => {
         return {
-            menssage: err.message
+            menssage: err.message,
+            statusCode: err.statusCode
         }
     }
     //err.statusCode = 400;
-    console.log(err.code);
-    
+    console.log(err);
+
     //tratar erros de suas origens
     switch (err.name) {
         case 'MongoError':
             if (err.code === 11000)
                 err.statusCode = 400;
+            break;
+        //erro de validações do mongoose
+        case 'ValidationError':
+            err.statusCode = 400;
+            //Se for erro de validações, vamos criar um array de mensagem e retornar para o cliente
+            //Para cada mensagem de validação, vamos colocar em um array
+            const messages: any[] = [];
+            for (let name in err.errors) {
+                messages.push({ message: err.errors[name].message })
+            }
+
+            //substituir o toJSON para retornar a lista de erros
+            err.toJSON = () => ({
+                errors: messages
+            });
+
             break;
     }
     done();

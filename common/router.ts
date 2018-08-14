@@ -1,6 +1,8 @@
 import * as restify from 'restify';
 //o modulo padrão do node, ele disponibiliza metodos de emitir eventos
 import { EventEmitter } from 'events';
+//gerenciado de erros do restify
+import { NotFoundError } from 'restify-errors';
 
 //Essa classe abstrata é criada para tornar pai das rotas e para que no arquivo server podemos
 //criar um for e percorrer cada rota declarando-a
@@ -20,7 +22,7 @@ export abstract class Router extends EventEmitter {
                 response.json(document);
             }
             else
-                response.send(404);
+                throw new NotFoundError('Documento não encontrado');
             return next();
         }
     }
