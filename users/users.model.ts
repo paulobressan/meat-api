@@ -1,5 +1,7 @@
 //importando o mongoose para conectar com o mongodb
 import * as mongoose from 'mongoose';
+//importando validator de cpf
+import { validateCPF } from '../common/validators';
 
 //criando uma interface que representa o documento user
 export interface User extends mongoose.Document {
@@ -41,6 +43,16 @@ const userSchema = new mongoose.Schema({
         //validação de tipos de dados validos para esse campo, por exemplo, podemos utilizar um enum
         //que valida os tipos de dados que podem ser inserido
         enum: ['Male', 'Female']
+    },
+    cpf: {
+        type: String,
+        required: false,
+        validate: {
+            validator: validateCPF,
+            //exindo a mensagem, o mongoose interpreta como uma template string e por isso podemos exibir valores de variaveis
+            message: '{PATH}: Invalid CPF ({VALUE})'
+        }
+        //validador personalizado
     }
 });
 

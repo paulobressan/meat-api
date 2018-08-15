@@ -2,6 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 //importando o mongoose para conectar com o mongodb
 const mongoose = require("mongoose");
+//importando validator de cpf
+const validators_1 = require("../common/validators");
 //criando um esquema do usuário para ser persistido no banco
 const userSchema = new mongoose.Schema({
     name: {
@@ -35,6 +37,16 @@ const userSchema = new mongoose.Schema({
         //validação de tipos de dados validos para esse campo, por exemplo, podemos utilizar um enum
         //que valida os tipos de dados que podem ser inserido
         enum: ['Male', 'Female']
+    },
+    cpf: {
+        type: String,
+        required: false,
+        validate: {
+            validator: validators_1.validateCPF,
+            //exindo a mensagem, o mongoose interpreta como uma template string e por isso podemos exibir valores de variaveis
+            message: '{PATH}: Invalid CPF ({VALUE})'
+        }
+        //validador personalizado
     }
 });
 //Estamos exportando a interface e essa constante, porem é apenas para um controle estatico de auto complite
