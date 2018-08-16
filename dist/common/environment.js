@@ -9,5 +9,9 @@ exports.environment = {
         //url do mongo pegar na variavel de ambiente ou a local que é formada por
         //mongodb://DOMINIO/BANCO
         url: process.env.DB_URL || 'mongodb://localhost/meat-api'
+    },
+    security: {
+        //Clicos que o bcrypt utilizadara para colocar uma informação dinamica para poder gerar o hash
+        saltRounds: process.env.SALT_ROUNDS || 10
     }
 };

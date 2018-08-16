@@ -4,6 +4,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose = require("mongoose");
 //importando validator de cpf
 const validators_1 = require("../common/validators");
+//importando o bcrypt
+const bcrypt = require("bcrypt");
+//importando environment
+const environment_1 = require("../common/environment");
 //criando um esquema do usuário para ser persistido no banco
 const userSchema = new mongoose.Schema({
     name: {
@@ -47,6 +51,31 @@ const userSchema = new mongoose.Schema({
             message: '{PATH}: Invalid CPF ({VALUE})'
         }
         //validador personalizado
+    }
+});
+//MIDDLEWARE
+//Criando eventos para realizar processos quando o evento for acionado
+//Vamos criar eventos para monitorar a persistencia de informação no schema
+//Para isso o mongoose tem a função (pre) que espera como primeiro parametro o metodo que queremos monitorar(save)
+//e como segundo parametro um callback onde passamos o next que funciona similar como o next do restify, ou seja
+//assim que a middleware terminar o processo, ela vai indicar para o mongoose que ele pode prosseguir com o fluxo.
+//Lembrando que não podemos utilizar o arrow para alterar o escopo do this utilizado.
+userSchema.pre('save', function (next) {
+    //identificar se estamos criando ou alterando o documento
+    //O objeto this, é um objeto de contexto e dependendo da middleware (save, count, find, findbyid) ele representa
+    //um documento uma query, como por exemplo o UpdateById, podemos ver na documentação do mongoose
+    const user = this;
+    //função isModified do mongoose para verificar se a prop foi alterada
+    if (!user.isModified('password')) {
+        next();
+    }
+    else {
+        //criptografando o password se o valor foi alterado
+        bcrypt.hash(user.password, environment_1.environment.security.saltRounds)
+            .then(hash => {
+            user.password = hash;
+            next();
+        });
     }
 });
 //Estamos exportando a interface e essa constante, porem é apenas para um controle estatico de auto complite

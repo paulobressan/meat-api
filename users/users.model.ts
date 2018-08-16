@@ -2,6 +2,10 @@
 import * as mongoose from 'mongoose';
 //importando validator de cpf
 import { validateCPF } from '../common/validators';
+//importando o bcrypt
+import * as bcrypt from 'bcrypt';
+//importando environment
+import { environment } from '../common/environment';
 
 //criando uma interface que representa o documento user
 export interface User extends mongoose.Document {
@@ -53,6 +57,31 @@ const userSchema = new mongoose.Schema({
             message: '{PATH}: Invalid CPF ({VALUE})'
         }
         //validador personalizado
+    }
+});
+
+//MIDDLEWARE
+//Criando eventos para realizar processos quando o evento for acionado
+//Vamos criar eventos para monitorar a persistencia de informação no schema
+//Para isso o mongoose tem a função (pre) que espera como primeiro parametro o metodo que queremos monitorar(save)
+//e como segundo parametro um callback onde passamos o next que funciona similar como o next do restify, ou seja
+//assim que a middleware terminar o processo, ela vai indicar para o mongoose que ele pode prosseguir com o fluxo.
+//Lembrando que não podemos utilizar o arrow para alterar o escopo do this utilizado.
+userSchema.pre('save', function (next) {
+    //identificar se estamos criando ou alterando o documento
+    //O objeto this, é um objeto de contexto e dependendo da middleware (save, count, find, findbyid) ele representa
+    //um documento uma query, como por exemplo o UpdateById, podemos ver na documentação do mongoose
+    const user: User = this;
+    //função isModified do mongoose para verificar se a prop foi alterada
+    if (!user.isModified('password')) {
+        next();
+    } else {
+        //criptografando o password se o valor foi alterado
+        bcrypt.hash(user.password, environment.security.saltRounds)
+            .then(hash => {
+                user.password = hash;
+                next();
+            })
     }
 });
 
