@@ -11,7 +11,9 @@ import { environment } from '../common/environment';
 export interface User extends mongoose.Document {
     name: string,
     email: string,
-    password: string
+    password: string,
+    gender: string,
+    cpf: string
 }
 
 //criando um esquema do usuário para ser persistido no banco
@@ -71,7 +73,7 @@ userSchema.pre('save', function (next) {
     //identificar se estamos criando ou alterando o documento
     //O objeto this, é um objeto de contexto e dependendo da middleware (save, count, find, findbyid) ele representa
     //um documento uma query, como por exemplo o UpdateById, podemos ver na documentação do mongoose
-    const user: User = this;
+    const user: User = <User>this;
     //função isModified do mongoose para verificar se a prop foi alterada
     if (!user.isModified('password')) {
         next();
@@ -81,7 +83,7 @@ userSchema.pre('save', function (next) {
             .then(hash => {
                 user.password = hash;
                 next();
-            })
+            }).catch(next())
     }
 });
 
