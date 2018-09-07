@@ -60,7 +60,11 @@ class UsersRouter extends Router {
         //realizando um put
         //o id do documento é imutavel depois de ser criado, porem podemos definir o id antes de ser criado
         application.put('/users/:id', (req, resp, next) => {
-            const options = { overwrite: true }
+            //Para que as validações funcione para os metodos de update, temos que ativar o runValidators
+            const options = {
+                runValidators: true, //Ativa as validações para metodos de updates
+                overwrite: true //Aplica a subscrita no documento completo.
+            }
             //por padrão o update sempre altera os dados parcialmente e no caso abaixo
             //queremos alterar todas prop do documento com as prop do body recebida
             User.update({ _id: req.params.id }, req.body, options)
@@ -89,12 +93,13 @@ class UsersRouter extends Router {
             //O findByIdUpdate retorna na promise o documento desatualizado e por isso temos que
             //criar uma options que retornara o documento atualizado
             const options = {
-                new: true
+                runValidators: true,
+                new: true //Retornar o objeto atualizado
             }
             //alterando parcialmente um documento, no put foi feito manualmente a atualização do 
             //documento, o findByIdAndUpdate é uma forma mais produtiva onde ele ja busca o documento
             // que vai ser alterado
-            User.findByIdAndUpdate(req.params.id, req.body, options)
+            User.findOneAndUpdate(req.params.id, req.body, options)
                 .then(
                     this.render(resp, next)
                 ).catch(next)

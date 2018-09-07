@@ -24,3 +24,4 @@ class Router extends events_1.EventEmitter {
     }
 }
 exports.Router = Router;
+//# sourceMappingURL=router.js.map

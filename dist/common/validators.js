@@ -31,3 +31,4 @@ exports.validateCPF = (cpf) => {
     }
     return true;
 };
+//# sourceMappingURL=validators.js.map

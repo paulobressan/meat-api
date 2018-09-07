@@ -22,3 +22,4 @@ exports.mergePatchBodyParser = (req, resp, next) => {
     }
     return next();
 };
+//# sourceMappingURL=merge-patch.parser.js.map

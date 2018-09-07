@@ -17,3 +17,4 @@ server.bootstrap([users_router_1.usersRouters]).then(server => {
     console.log(err);
     process.exit(1);
 });
+//# sourceMappingURL=main.js.map

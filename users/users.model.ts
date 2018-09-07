@@ -62,14 +62,20 @@ const userSchema = new mongoose.Schema({
     }
 });
 
-//MIDDLEWARE
-//Criando eventos para realizar processos quando o evento for acionado
-//Vamos criar eventos para monitorar a persistencia de informação no schema
-//Para isso o mongoose tem a função (pre) que espera como primeiro parametro o metodo que queremos monitorar(save)
-//e como segundo parametro um callback onde passamos o next que funciona similar como o next do restify, ou seja
-//assim que a middleware terminar o processo, ela vai indicar para o mongoose que ele pode prosseguir com o fluxo.
-//Lembrando que não podemos utilizar o arrow para alterar o escopo do this utilizado.
-userSchema.pre('save', function (next) {
+
+// MIDDLEWARE's
+
+// criando uma função que crie um hash criptografado do password
+const hashPassword = (obj, next) => {
+    bcrypt.hash(obj.password, environment.security.saltRounds)
+        .then(hash => {
+            obj.password = hash;
+            next();
+        }).catch(next)
+}
+
+//Criando a função que o middleware vai executar
+const saveMiddleware = function (next) {
     //identificar se estamos criando ou alterando o documento
     //O objeto this, é um objeto de contexto e dependendo da middleware (save, count, find, findbyid) ele representa
     //um documento uma query, como por exemplo o UpdateById, podemos ver na documentação do mongoose
@@ -79,13 +85,41 @@ userSchema.pre('save', function (next) {
         next();
     } else {
         //criptografando o password se o valor foi alterado
-        bcrypt.hash(user.password, environment.security.saltRounds)
-            .then(hash => {
-                user.password = hash;
-                next();
-            }).catch(next())
+        hashPassword(user, next);
     }
-});
+}
+
+//middleware de update
+const updateMiddleware = function (next) {
+    //Se no escopo não conter atualização do password, não sera feito nada.
+    if (!this.getUpdate().password) {
+        console.log("Update");
+        
+        next();
+    } else {
+        console.log("Update");
+        //criptografando o password se o valor foi alterado
+        //Podemos pegar os valores do schema com o escopo. (this.getUpdate().password)
+        hashPassword(this.getUpdate(), next);
+    }
+}
+
+//MIDDLEWARE
+//Criando eventos para realizar processos quando o evento for acionado
+//Vamos criar eventos para monitorar a persistencia de informação no schema
+//Para isso o mongoose tem a função (pre) que espera como primeiro parametro o metodo que queremos monitorar(save)
+//e como segundo parametro um callback onde passamos o next que funciona similar como o next do restify, ou seja
+//assim que a middleware terminar o processo, ela vai indicar para o mongoose que ele pode prosseguir com o fluxo.
+//Lembrando que não podemos utilizar o arrow para alterar o escopo do this utilizado.
+userSchema.pre('save', saveMiddleware);
+
+//Para realizar um middleware de update, temos que utilizar o seu metodo. (FindOneAndUpdate)
+//metodo PATCH
+userSchema.pre('findOneAndUpdate', updateMiddleware);
+
+//Para realizar um middleware de update, temos que utilizar o seu metodo. (Update)
+//metodo PUT
+userSchema.pre('update', updateMiddleware);
 
 //Estamos exportando a interface e essa constante, porem é apenas para um controle estatico de auto complite
 //o module é exportado com o tipo da interface, com isso podemos atribuir valores as prop
