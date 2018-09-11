@@ -73,6 +73,7 @@ const saveMiddleware = function (next) {
         next();
     }
     else {
+        console.log("Middleware save");
         //criptografando o password se o valor foi alterado
         hashPassword(user, next);
     }
@@ -81,11 +82,10 @@ const saveMiddleware = function (next) {
 const updateMiddleware = function (next) {
     //Se no escopo não conter atualização do password, não sera feito nada.
     if (!this.getUpdate().password) {
-        console.log("Update");
         next();
     }
     else {
-        console.log("Update");
+        console.log("Middleware Update");
         //criptografando o password se o valor foi alterado
         //Podemos pegar os valores do schema com o escopo. (this.getUpdate().password)
         hashPassword(this.getUpdate(), next);
