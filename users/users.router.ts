@@ -1,14 +1,15 @@
 import * as restify from 'restify';
-import { Router } from '../common/router';
+import { ModelRouter} from '../common/model-router';
 //importando o model de usuarios
 import { User } from '../users/users.model';
 //gerenciado de erros do restify
 import { NotFoundError } from 'restify-errors';
 
 //classe que define rotas de usuarios
-class UsersRouter extends Router {
+//extende para ModelRouter que abstrai os acesso ao banco de dados escolhendo o tipo da classe.
+class UsersRouter extends ModelRouter<User> {
     constructor() {
-        super()
+        super(User)
         //capturando eventos da classe pai antes que o metodo de retorno das rotas
         //retorna os objetos para o cliente, assim podemos manipular o valor antes
         //que ele retorne
@@ -20,17 +21,8 @@ class UsersRouter extends Router {
     }
 
     applyRoutes(application: restify.Server) {
-        application.get('/users', (req, resp, next) => {
-            User.find()
-                .then(
-                    //metodo herdado de Router
-                    this.render(resp, next)
-                ).catch(next)
-            // //OU
-            // .catch(err => {
-            //     next(err)
-            // })
-        });
+        //buscar todos usuários
+        application.get('/users', this.findAll);
 
         application.get('/users/:id', (req, resp, next) => {
             User.findById(req.params.id)

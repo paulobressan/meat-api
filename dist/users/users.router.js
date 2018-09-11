@@ -1,14 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const router_1 = require("../common/router");
+const model_router_1 = require("../common/model-router");
 //importando o model de usuarios
 const users_model_1 = require("../users/users.model");
 //gerenciado de erros do restify
 const restify_errors_1 = require("restify-errors");
 //classe que define rotas de usuarios
-class UsersRouter extends router_1.Router {
+//extende para ModelRouter que abstrai os acesso ao banco de dados escolhendo o tipo da classe.
+class UsersRouter extends model_router_1.ModelRouter {
     constructor() {
-        super();
+        super(users_model_1.User);
         //capturando eventos da classe pai antes que o metodo de retorno das rotas
         //retorna os objetos para o cliente, assim podemos manipular o valor antes
         //que ele retorne
@@ -19,16 +20,8 @@ class UsersRouter extends router_1.Router {
         });
     }
     applyRoutes(application) {
-        application.get('/users', (req, resp, next) => {
-            users_model_1.User.find()
-                .then(
-            //metodo herdado de Router
-            this.render(resp, next)).catch(next);
-            // //OU
-            // .catch(err => {
-            //     next(err)
-            // })
-        });
+        //buscar todos usuários
+        application.get('/users', this.findAll);
         application.get('/users/:id', (req, resp, next) => {
             users_model_1.User.findById(req.params.id)
                 .then(this.render(resp, next)).catch(next);
