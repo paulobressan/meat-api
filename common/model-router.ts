@@ -17,5 +17,4 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
                 this.render(resp, next)
             ).catch(next)
     }
-
 }
