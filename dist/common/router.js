@@ -22,6 +22,19 @@ class Router extends events_1.EventEmitter {
             return next();
         };
     }
+    //O render all é especifico para retornar listas. O render não suporta retornar listas, 
+    //portanto temos que criar um novo metodo que trate retorno de lista.
+    renderAll(response, next) {
+        return (documents) => {
+            if (documents) {
+                documents.forEach(document => this.emit('beforeRender', document));
+                response.json(documents);
+            }
+            else {
+                response.json([]);
+            }
+        };
+    }
 }
 exports.Router = Router;
 //# sourceMappingURL=router.js.map

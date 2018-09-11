@@ -26,4 +26,17 @@ export abstract class Router extends EventEmitter {
             return next();
         }
     }
+
+    //O render all é especifico para retornar listas. O render não suporta retornar listas, 
+    //portanto temos que criar um novo metodo que trate retorno de lista.
+    renderAll(response: restify.Response, next: restify.Next){
+        return (documents: any[]) => {
+            if(documents){
+                documents.forEach(document => this.emit('beforeRender', document));
+                response.json(documents);
+            }else{
+                response.json([]);
+            }
+        }
+    }
 }
