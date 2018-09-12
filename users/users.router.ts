@@ -20,9 +20,24 @@ class UsersRouter extends ModelRouter<User> {
         })
     }
 
+    //metodo para a segunda versão de busca de usuário
+    findByEmail = (req: restify.Request, resp: restify.Response, next: restify.Next) => {
+        //Se foi passado o email
+        if (req.query.email) {
+            User.find({ email: req.query.email })
+                .then(this.renderAll(resp, next))
+                .catch(next)
+        } else {
+            next();
+        }
+    }
+
     applyRoutes(application: restify.Server) {
         //buscar todos usuários
-        application.get('/users', this.findAll);
+        //Versionando a rota de busca de usuário.
+        //o cliente tem que informar a versão ou o restify vai pegar a mais atual
+        application.get({ path: '/users', version: '2.0.0' }, [this.findByEmail, this.findAll]);
+        application.get({ path: '/users', version: '1.0.0' }, this.findAll);
         //Todo metodo pode conter mais de um callback, para que o mongoose suporte, temos que adicionar um array de callback
         //Somente utilizar o validate id onde tem como parametro o id
         application.get('/users/:id', [this.validateId, this.findById]);

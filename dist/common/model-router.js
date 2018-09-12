@@ -22,13 +22,14 @@ class ModelRouter extends router_1.Router {
         };
         //Abstraindo o find all
         this.findAll = (req, resp, next) => {
-            this.model.find()
+            this.prepareAll(this.model.find())
                 .then(
             //metodo herdado de Router
             this.render(resp, next)).catch(next);
         };
         this.findById = (req, resp, next) => {
-            this.model.findById(req.params.id)
+            //usando o metodo prepareOne para que possa ser personalizada a query da consulta
+            this.prepareOne(this.model.findById(req.params.id))
                 .then(this.render(resp, next)).catch(next);
         };
         this.save = (req, resp, next) => {
@@ -56,7 +57,7 @@ class ModelRouter extends router_1.Router {
                     //Se não aplicar a alteração no documento é porque o documento não existe.
                     throw new restify_errors_1.NotFoundError('Documento não encontrado');
                 //Se o documento foi alterado, vamos retornar o documento alterado
-                return this.model.findById(req.params.id);
+                return this.prepareOne(this.model.findById(req.params.id));
             })
                 .then(this.render(resp, next))
                 .catch(next);
@@ -88,6 +89,15 @@ class ModelRouter extends router_1.Router {
                 return next();
             }).catch(next);
         };
+    }
+    //metodo para preparar query de uma consulta
+    //<d, d> Ela trabalha com um tipo e retorna o mesmo tipo
+    prepareOne(query) {
+        return query;
+    }
+    //metodo para preparar query da consulta todos documentos
+    prepareAll(query) {
+        return query;
     }
 }
 exports.ModelRouter = ModelRouter;

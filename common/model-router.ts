@@ -11,6 +11,17 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
         super();
     }
 
+    //metodo para preparar query de uma consulta
+    //<d, d> Ela trabalha com um tipo e retorna o mesmo tipo
+    protected prepareOne(query: mongoose.DocumentQuery<D, D>): mongoose.DocumentQuery<D, D> {
+        return query;
+    }
+
+    //metodo para preparar query da consulta todos documentos
+    protected prepareAll(query: mongoose.DocumentQuery<D[], D>): mongoose.DocumentQuery<D[], D> {
+        return query;
+    }
+
     //validar o ID se esta no formato correto
     //essa função é utilizada nas rotas, onde a rota suporta um array de callback, portanto temos uma sequença de execução
     //primeiro callback é o validateId porque se o id não for valido vamos retornar um 404 se não podemos ir para o proximo callback.
@@ -23,7 +34,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
 
     //Abstraindo o find all
     findAll = (req, resp, next) => {
-        this.model.find()
+       this.prepareAll(this.model.find())
             .then(
                 //metodo herdado de Router
                 this.render(resp, next)
@@ -31,7 +42,8 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     }
 
     findById = (req, resp, next) => {
-        this.model.findById(req.params.id)
+        //usando o metodo prepareOne para que possa ser personalizada a query da consulta
+        this.prepareOne(this.model.findById(req.params.id))
             .then(
                 this.render(resp, next)
             ).catch(next)
@@ -59,11 +71,11 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
             .exec()
             .then(result => {
                 //Se o documento foi subscrevido
-                if (result.n) 
+                if (result.n)
                     //Se não aplicar a alteração no documento é porque o documento não existe.
                     throw new NotFoundError('Documento não encontrado');
                 //Se o documento foi alterado, vamos retornar o documento alterado
-                return this.model.findById(req.params.id);               
+                return this.prepareOne(this.model.findById(req.params.id));
             })
             .then(this.render(resp, next))
             .catch(next)

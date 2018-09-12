@@ -7,10 +7,19 @@ class ReviewRouter extends model_router_1.ModelRouter {
     constructor() {
         super(reviews_module_1.Review);
     }
+    //SOBRESCREVENDO O METODO DO ROUTER MODULE USADO NO FINDBYID. ASSIM PODEMOS PERSONALIZAR NOSSAS CONSULTAS
+    //COMO POR EXEMPLO USANDO O POPULATE
+    prepareOne(query) {
+        //retornando a query utilizada no findbyid.
+        //a query é personalizada para que possamos trazer as referencias do documento referenciados.
+        return query
+            .populate('user', 'name')
+            .populate('restaurant', 'name');
+    }
     // findById = (req, resp, next) => {
     //     this.model.findById(req.params.id)
     //         .populate('user', 'name')
-    //         .populate('restaurant')
+    //         .populate('restaurant','name')
     //         .then(
     //             this.render(resp, next)
     //         ).catch(next)
