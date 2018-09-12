@@ -30,5 +30,5 @@ const restaurantsSchema = new mongoose.Schema({
         default: []
     }
 });
-exports.restaurant = mongoose.model('Restaurant', restaurantsSchema);
+exports.Restaurant = mongoose.model('Restaurant', restaurantsSchema);
 //# sourceMappingURL=restaurants.module.js.map

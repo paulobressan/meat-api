@@ -34,9 +34,9 @@ export abstract class Router extends EventEmitter {
             if(documents){
                 documents.forEach(document => this.emit('beforeRender', document));
                 response.json(documents);
-            }else{
-                response.json([]);
-            }
+            }else
+                response.json([]);   
+            return next();        
         }
     }
 }

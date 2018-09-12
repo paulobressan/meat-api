@@ -30,9 +30,9 @@ class Router extends events_1.EventEmitter {
                 documents.forEach(document => this.emit('beforeRender', document));
                 response.json(documents);
             }
-            else {
+            else
                 response.json([]);
-            }
+            return next();
         };
     }
 }

@@ -36,7 +36,8 @@ class ModelRouter extends router_1.Router {
             //podemos passar direto o req.body desque estamos utilizando o plugin body parser
             let user = new this.model(req.body);
             user.save()
-                .then(this.render(resp, next)).catch(next);
+                .then(this.render(resp, next))
+                .catch(next);
         };
         this.replace = (req, resp, next) => {
             //Para que as validações funcione para os metodos de update, temos que ativar o runValidators
@@ -51,16 +52,14 @@ class ModelRouter extends router_1.Router {
                 .exec()
                 .then(result => {
                 //Se o documento foi subscrevido
-                if (result.n) {
-                    //Se o documento foi alterado, vamos retornar o documento alterado
-                    return this.model.findById(req.params.id);
-                }
-                else {
+                if (result.n)
                     //Se não aplicar a alteração no documento é porque o documento não existe.
                     throw new restify_errors_1.NotFoundError('Documento não encontrado');
-                }
+                //Se o documento foi alterado, vamos retornar o documento alterado
+                return this.model.findById(req.params.id);
             })
-                .then(this.render(resp, next)).catch(next);
+                .then(this.render(resp, next))
+                .catch(next);
         };
         this.update = (req, resp, next) => {
             //O findByIdUpdate retorna na promise o documento desatualizado e por isso temos que
@@ -73,7 +72,8 @@ class ModelRouter extends router_1.Router {
             //documento, o findByIdAndUpdate é uma forma mais produtiva onde ele ja busca o documento
             // que vai ser alterado
             this.model.findOneAndUpdate(req.params.id, req.body, options)
-                .then(this.render(resp, next)).catch(next);
+                .then(this.render(resp, next))
+                .catch(next);
         };
         this.delete = (req, resp, next) => {
             //como não queremos retornar nada depois que remover, podemos simplesmente usar o metodo remove
@@ -82,9 +82,7 @@ class ModelRouter extends router_1.Router {
                 .exec()
                 .then((result) => {
                 //Se o algum documento foi afetado
-                if (result.n)
-                    throw new restify_errors_1.NotFoundError('Documento não encontrado');
-                else
+                if (!result.n)
                     //Se não é porque não encontrou nenhum documento com o id passado
                     throw new restify_errors_1.NotFoundError('Documento não encontrado');
                 return next();

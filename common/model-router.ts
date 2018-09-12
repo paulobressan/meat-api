@@ -42,9 +42,8 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
         //podemos passar direto o req.body desque estamos utilizando o plugin body parser
         let user = new this.model(req.body);
         user.save()
-            .then(
-                this.render(resp, next)
-            ).catch(next)
+            .then(this.render(resp, next))
+            .catch(next)
     }
 
     replace = (req, resp, next) => {
@@ -60,17 +59,14 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
             .exec()
             .then(result => {
                 //Se o documento foi subscrevido
-                if (result.n) {
-                    //Se o documento foi alterado, vamos retornar o documento alterado
-                    return this.model.findById(req.params.id);
-                } else {
+                if (result.n) 
                     //Se não aplicar a alteração no documento é porque o documento não existe.
                     throw new NotFoundError('Documento não encontrado');
-                }
+                //Se o documento foi alterado, vamos retornar o documento alterado
+                return this.model.findById(req.params.id);               
             })
-            .then(
-                this.render(resp, next)
-            ).catch(next)
+            .then(this.render(resp, next))
+            .catch(next)
     }
 
     update = (req, resp, next) => {
@@ -84,9 +80,8 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
         //documento, o findByIdAndUpdate é uma forma mais produtiva onde ele ja busca o documento
         // que vai ser alterado
         this.model.findOneAndUpdate(req.params.id, req.body, options)
-            .then(
-                this.render(resp, next)
-            ).catch(next)
+            .then(this.render(resp, next))
+            .catch(next)
     }
 
     delete = (req, resp, next) => {
@@ -96,9 +91,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
             .exec()
             .then((result: any) => {
                 //Se o algum documento foi afetado
-                if (result.n)
-                    throw new NotFoundError('Documento não encontrado');
-                else
+                if (!result.n)
                     //Se não é porque não encontrou nenhum documento com o id passado
                     throw new NotFoundError('Documento não encontrado');
                 return next();

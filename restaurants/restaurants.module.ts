@@ -7,7 +7,7 @@ export interface MenuItem extends mongoose.Document {
 }
 
 //DOCUMENT
-export interface Restaurants extends mongoose.Document {
+export interface Restaurant extends mongoose.Document {
     name: string,
     menu: MenuItem[]
 }
@@ -43,4 +43,4 @@ const restaurantsSchema = new mongoose.Schema({
     }
 })
 
-export const restaurant = mongoose.model<Restaurants>('Restaurant', restaurantsSchema);
+export const Restaurant = mongoose.model<Restaurant>('Restaurant', restaurantsSchema);
