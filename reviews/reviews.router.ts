@@ -2,8 +2,6 @@ import * as restify from 'restify';
 import { ModelRouter } from '../common/model-router';
 //importando o model de usuarios
 import { Review } from '../reviews/reviews.module';
-//gerenciado de erros do restify
-import { NotFoundError } from 'restify-errors';
 import * as mongoose from 'mongoose';
 
 class ReviewRouter extends ModelRouter<Review> {

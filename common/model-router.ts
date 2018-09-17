@@ -22,6 +22,13 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
         return query;
     }
 
+    //sobreescrevendo o metodo envelope para envelopar alguns dados(HYPERMEDIA)
+    envelope(document: any): any {
+        //O assign inicializa um documento, no caso abaixo com documento vazio e o segundo parametro é os valores
+        let resource = Object.assign({ _links: {} }, document.toJSON());
+        return resource;
+    }
+
     //validar o ID se esta no formato correto
     //essa função é utilizada nas rotas, onde a rota suporta um array de callback, portanto temos uma sequença de execução
     //primeiro callback é o validateId porque se o id não for valido vamos retornar um 404 se não podemos ir para o proximo callback.
@@ -34,7 +41,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
 
     //Abstraindo o find all
     findAll = (req, resp, next) => {
-       this.prepareAll(this.model.find())
+        this.prepareAll(this.model.find())
             .then(
                 //metodo herdado de Router
                 this.render(resp, next)

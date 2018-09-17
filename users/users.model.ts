@@ -16,6 +16,13 @@ export interface User extends mongoose.Document {
     cpf: string
 }
 
+//Usando a interface para utilziar metodos personalizados
+//usado para que o typescript possa aplicar os metodos statics criado no schema, sem ele o typescript não reconhece
+//o novo metodo static
+export interface UserModel extends mongoose.Model<User>{
+    findByEmail(email:string):Promise<User>;
+}
+
 //criando um esquema do usuário para ser persistido no banco
 const userSchema = new mongoose.Schema({
     name: {
@@ -62,6 +69,12 @@ const userSchema = new mongoose.Schema({
     }
 });
 
+//Metodos personalizados no model
+//O mongoose recomenda usar function e não arrow function pelo fato do escopo
+userSchema.statics.findByEmail = function (email: string) {
+    return this.findOne({ email });
+}
+
 
 // MIDDLEWARE's
 
@@ -84,7 +97,7 @@ const saveMiddleware = function (next) {
     if (!user.isModified('password')) {
         next();
     } else {
-        console.log("Middleware save");        
+        console.log("Middleware save");
         //criptografando o password se o valor foi alterado
         hashPassword(user, next);
     }
@@ -123,4 +136,5 @@ userSchema.pre('update', updateMiddleware);
 //Estamos exportando a interface e essa constante, porem é apenas para um controle estatico de auto complite
 //o module é exportado com o tipo da interface, com isso podemos atribuir valores as prop
 //quando criar um novo documento
-export const User = mongoose.model<User>('User', userSchema);
+//Podemos tipar mais de um model, como por exemplo o model
+export const User = mongoose.model<User, UserModel>('User', userSchema);

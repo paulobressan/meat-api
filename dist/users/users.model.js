@@ -53,6 +53,11 @@ const userSchema = new mongoose.Schema({
         //validador personalizado
     }
 });
+//Metodos personalizados no model
+//O mongoose recomenda usar function e não arrow function pelo fato do escopo
+userSchema.statics.findByEmail = function (email) {
+    return this.findOne({ email });
+};
 // MIDDLEWARE's
 // criando uma função que crie um hash criptografado do password
 const hashPassword = (obj, next) => {
@@ -108,5 +113,6 @@ userSchema.pre('update', updateMiddleware);
 //Estamos exportando a interface e essa constante, porem é apenas para um controle estatico de auto complite
 //o module é exportado com o tipo da interface, com isso podemos atribuir valores as prop
 //quando criar um novo documento
+//Podemos tipar mais de um model, como por exemplo o model
 exports.User = mongoose.model('User', userSchema);
 //# sourceMappingURL=users.model.js.map

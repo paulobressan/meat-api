@@ -10,6 +10,11 @@ export abstract class Router extends EventEmitter {
     //metodo utilizado para abstrair as aplicação de rotas no server.ts
     abstract applyRoutes(application: restify.Server);
 
+    //criado para pegar os dados do documento e adicionar mais dados no documento
+    envelope(document: any){
+        return document;
+    }
+
     //metodo responsavel por centralizar os retorno do end-point
     render(response: restify.Response, next: restify.Next) {
         return (document) => {
@@ -19,7 +24,7 @@ export abstract class Router extends EventEmitter {
                 //retirar campos para não exibir para o cliente, temos que escutar um evento antes de retornar
                 //portanto é emitido nessa função e quem chamou escuta o evento
                 this.emit('beforeRender', document);
-                response.json(document);
+                response.json(this.envelope(document));
             }
             else
                 throw new NotFoundError('Documento não encontrado');
@@ -32,7 +37,11 @@ export abstract class Router extends EventEmitter {
     renderAll(response: restify.Response, next: restify.Next){
         return (documents: any[]) => {
             if(documents){
-                documents.forEach(document => this.emit('beforeRender', document));
+                documents.forEach((document, index, array) => {
+                    this.emit('beforeRender', document);
+                    //Para cada documento vamos envelopar dados auxiliares
+                    array[index] = this.envelope(document);
+                });
                 response.json(documents);
             }else
                 response.json([]);   

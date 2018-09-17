@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const restify = require("restify");
 const model_router_1 = require("../common/model-router");
 //importando o model de usuarios
 const users_model_1 = require("../users/users.model");
@@ -12,7 +13,15 @@ class UsersRouter extends model_router_1.ModelRouter {
         this.findByEmail = (req, resp, next) => {
             //Se foi passado o email
             if (req.query.email) {
-                users_model_1.User.find({ email: req.query.email })
+                users_model_1.User.findByEmail(req.query.email)
+                    //Como o render comun retorna notfound se não encontrar, vamos converter para um array o resultado
+                    //para usar o renderAll
+                    .then(user => {
+                    //Se encontrar objeto, retorna o objeto, senão retorna uma lista vazia
+                    if (user)
+                        return [user];
+                    return [];
+                })
                     .then(this.renderAll(resp, next))
                     .catch(next);
             }
@@ -33,8 +42,10 @@ class UsersRouter extends model_router_1.ModelRouter {
         //buscar todos usuários
         //Versionando a rota de busca de usuário.
         //o cliente tem que informar a versão ou o restify vai pegar a mais atual
-        application.get({ path: '/users', version: '2.0.0' }, [this.findByEmail, this.findAll]);
-        application.get({ path: '/users', version: '1.0.0' }, this.findAll);
+        application.get('/users', restify.plugins.conditionalHandler([
+            { version: '1.0.0', handler: this.findAll },
+            { version: '2.0.0', handler: [this.findByEmail, this.findAll] }
+        ]));
         //Todo metodo pode conter mais de um callback, para que o mongoose suporte, temos que adicionar um array de callback
         //Somente utilizar o validate id onde tem como parametro o id
         application.get('/users/:id', [this.validateId, this.findById]);

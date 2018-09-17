@@ -2,8 +2,6 @@ import * as restify from 'restify';
 import { ModelRouter } from '../common/model-router';
 //importando o model de usuarios
 import { User } from '../users/users.model';
-//gerenciado de erros do restify
-import { NotFoundError } from 'restify-errors';
 
 //classe que define rotas de usuarios
 //extende para ModelRouter que abstrai os acesso ao banco de dados escolhendo o tipo da classe.
@@ -24,7 +22,15 @@ class UsersRouter extends ModelRouter<User> {
     findByEmail = (req: restify.Request, resp: restify.Response, next: restify.Next) => {
         //Se foi passado o email
         if (req.query.email) {
-            User.find({ email: req.query.email })
+            User.findByEmail(req.query.email)
+                //Como o render comun retorna notfound se não encontrar, vamos converter para um array o resultado
+                //para usar o renderAll
+                .then(user => {
+                    //Se encontrar objeto, retorna o objeto, senão retorna uma lista vazia
+                    if (user)
+                        return [user];
+                    return [];
+                })
                 .then(this.renderAll(resp, next))
                 .catch(next)
         } else {
@@ -36,8 +42,10 @@ class UsersRouter extends ModelRouter<User> {
         //buscar todos usuários
         //Versionando a rota de busca de usuário.
         //o cliente tem que informar a versão ou o restify vai pegar a mais atual
-        application.get({ path: '/users', version: '2.0.0' }, [this.findByEmail, this.findAll]);
-        application.get({ path: '/users', version: '1.0.0' }, this.findAll);
+        application.get('/users', restify.plugins.conditionalHandler([
+            { version: '1.0.0', handler: this.findAll },
+            { version: '2.0.0', handler: [this.findByEmail, this.findAll] }
+        ]));
         //Todo metodo pode conter mais de um callback, para que o mongoose suporte, temos que adicionar um array de callback
         //Somente utilizar o validate id onde tem como parametro o id
         application.get('/users/:id', [this.validateId, this.findById]);

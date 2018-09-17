@@ -99,6 +99,12 @@ class ModelRouter extends router_1.Router {
     prepareAll(query) {
         return query;
     }
+    //sobreescrevendo o metodo envelope para envelopar alguns dados(HYPERMEDIA)
+    envelope(document) {
+        //O assign inicializa um documento, no caso abaixo com documento vazio e o segundo parametro é os valores
+        let resource = Object.assign({ _links: {} }, document.toJSON());
+        return resource;
+    }
 }
 exports.ModelRouter = ModelRouter;
 //# sourceMappingURL=model-router.js.map
