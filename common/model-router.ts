@@ -6,9 +6,13 @@ import { NotFoundError } from 'restify-errors';
 //Classe para abstrair a repetição de código de manipulção da base de dados. O mongoose.model no construtor espera
 //o tipo de model que essa classe recebera, para isso temos que tornar generico a nossa classe com D extends mongoose.docuemnt
 export abstract class ModelRouter<D extends mongoose.Document> extends Router {
+    basePath: string;
+
     //É necessario passar no construtor o model que sera utilizado
     constructor(protected model: mongoose.Model<D>) {
         super();
+        //Se algum modelo ter uma rota personalizada, pordemos usar o base path para criar o link de rotas personalizadas
+        this.basePath = `/${this.model.collection.name}`;
     }
 
     //metodo para preparar query de uma consulta
@@ -26,6 +30,8 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     envelope(document: any): any {
         //O assign inicializa um documento, no caso abaixo com documento vazio e o segundo parametro é os valores
         let resource = Object.assign({ _links: {} }, document.toJSON());
+        //Criando link para acesso ao documento
+        resource._links.self = `${/*Nome da coleção do contexto*/this.basePath}/${/*Pegando o id do documento*/resource._id}`;
         return resource;
     }
 
@@ -44,7 +50,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
         this.prepareAll(this.model.find())
             .then(
                 //metodo herdado de Router
-                this.render(resp, next)
+                this.renderAll(resp, next)
             ).catch(next)
     }
 

@@ -10,6 +10,16 @@ class RestaurantRouter extends ModelRouter<Restaurant>{
         super(Restaurant);
     }
 
+    //Envelopando links personalizados, individual
+    //Não é necessario subscrever o metodo, temos que adicionar novos links e para isso vamos
+    //Usar o super para trazer o conteudo pai sem subscrever
+    envelope(document:any){
+        let resource = super.envelope(document);
+        //Link para acessar o menu 
+        resource._links.menu = `${this.basePath}/${document._id}/menu`;
+        return resource;
+    }
+
     //O ModelRouter conta com chamdas "Padrões" que todo model usa, porem quando temos que realizar 
     //uma consulta especifica temos que criar uma função especifica para isso.
     findMenu = (req: restify.Request, resp:restify.Response, next:restify.Next) =>{
@@ -37,18 +47,16 @@ class RestaurantRouter extends ModelRouter<Restaurant>{
         .catch(next);
     }
 
-
-    
     applyRoutes(application: restify.Server) {
-        application.get('/restaurants', this.findAll);
-        application.get('/restaurants/:id', [this.validateId, this.findById]);
-        application.post('/restaurants', this.save);
-        application.put('/restaurants/:id', [this.validateId, this.replace]);
-        application.patch('/restaurants/:id', [this.validateId, this.update]);
-        application.del('/restaurants/:id',[this.validateId, this.delete]);
+        application.get(`${this.basePath}`, this.findAll);
+        application.get(`${this.basePath}/:id`, [this.validateId, this.findById]);
+        application.post(`${this.basePath}`, this.save);
+        application.put(`${this.basePath}/:id`, [this.validateId, this.replace]);
+        application.patch(`${this.basePath}/:id`, [this.validateId, this.update]);
+        application.del(`${this.basePath}/:id`,[this.validateId, this.delete]);
         //rotas para trabalhar com o sub documento Menu
-        application.get('/restaurants/:id/menu', [this.validateId, this.findMenu]);
-        application.put('/restaurants/:id/menu', [this.validateId, this.replaceMenu]);
+        application.get(`${this.basePath}/:id/menu`, [this.validateId, this.findMenu]);
+        application.put(`${this.basePath}/:id/menu`, [this.validateId, this.replaceMenu]);
     }
 }
 

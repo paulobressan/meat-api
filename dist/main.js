@@ -7,10 +7,11 @@ const server_1 = require("./server/server");
 const users_router_1 = require("./users/users.router");
 const restaurants_router_1 = require("./restaurants/restaurants.router");
 const reviews_router_1 = require("./reviews/reviews.router");
+const root_router_1 = require("./root/root.router");
 //criando uma instancia de server
 const server = new server_1.Server();
 //Chamar o boostrap que inicializa o servidor e passamos como parametro as rotas
-server.bootstrap([users_router_1.usersRouters, restaurants_router_1.restaurantRouter, reviews_router_1.reviewsRouter]).then(server => {
+server.bootstrap([users_router_1.usersRouters, restaurants_router_1.restaurantRouter, reviews_router_1.reviewsRouter, root_router_1.rootRouter]).then(server => {
     //Se tudo der certo, vamos logar no terminar a porta que esta rodando o servidor.
     console.log('Servidor rodando ', server.application.address());
 }).catch(err => {

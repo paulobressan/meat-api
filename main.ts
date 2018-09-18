@@ -5,11 +5,12 @@ import {Server} from './server/server';
 import {usersRouters} from './users/users.router';
 import {restaurantRouter} from './restaurants/restaurants.router';
 import {reviewsRouter} from './reviews/reviews.router';
+import {rootRouter} from './root/root.router';
 
 //criando uma instancia de server
 const server = new Server();
 //Chamar o boostrap que inicializa o servidor e passamos como parametro as rotas
-server.bootstrap([usersRouters, restaurantRouter, reviewsRouter]).then(server=>{
+server.bootstrap([usersRouters, restaurantRouter, reviewsRouter, rootRouter]).then(server=>{
     //Se tudo der certo, vamos logar no terminar a porta que esta rodando o servidor.
     console.log('Servidor rodando ', server.application.address());
 }).catch(err => {

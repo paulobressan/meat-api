@@ -9,6 +9,17 @@ class ReviewRouter extends ModelRouter<Review> {
         super(Review);
     }
 
+    //Envelopando links personalizados, individual
+    //Criando links para acessar restaurant e user
+    envelope(document:any){
+        let resource = super.envelope(document);
+        //pegando o restaurant id, o restaurant id pode ser o ID ou o restaurant populado, então temos que criar uma condição
+        const restId = document.restaurant._id ? document.restaurant._id : document.restaurant;
+        //Prop dinamica
+        resource._links.restaurant = `/restaurants/${restId}`;
+        return resource;
+    }
+
     //SOBRESCREVENDO O METODO DO ROUTER MODULE USADO NO FINDBYID. ASSIM PODEMOS PERSONALIZAR NOSSAS CONSULTAS
     //COMO POR EXEMPLO USANDO O POPULATE
     protected prepareOne(query: mongoose.DocumentQuery<Review, Review>): mongoose.DocumentQuery<Review, Review> {
@@ -18,6 +29,7 @@ class ReviewRouter extends ModelRouter<Review> {
             .populate('user','name')
             .populate('restaurant','name')
     }
+    //OU
     // findById = (req, resp, next) => {
     //     this.model.findById(req.params.id)
     //         .populate('user', 'name')
@@ -28,9 +40,9 @@ class ReviewRouter extends ModelRouter<Review> {
     // }
 
     applyRoutes(application: restify.Server) {
-        application.get('/reviews', this.findAll);
-        application.get('/reviews/:id', [this.validateId, this.findById]);
-        application.post('/reviews', this.save);
+        application.get(`${this.basePath}`, this.findAll);
+        application.get(`${this.basePath}/:id`, [this.validateId, this.findById]);
+        application.post(`${this.basePath}`, this.save);
     }
 }
 

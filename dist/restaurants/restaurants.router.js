@@ -35,16 +35,25 @@ class RestaurantRouter extends model_router_1.ModelRouter {
                 .catch(next);
         };
     }
+    //Envelopando links personalizados, individual
+    //Não é necessario subscrever o metodo, temos que adicionar novos links e para isso vamos
+    //Usar o super para trazer o conteudo pai sem subscrever
+    envelope(document) {
+        let resource = super.envelope(document);
+        //Link para acessar o menu 
+        resource._links.menu = `${this.basePath}/${document._id}/menu`;
+        return resource;
+    }
     applyRoutes(application) {
-        application.get('/restaurants', this.findAll);
-        application.get('/restaurants/:id', [this.validateId, this.findById]);
-        application.post('/restaurants', this.save);
-        application.put('/restaurants/:id', [this.validateId, this.replace]);
-        application.patch('/restaurants/:id', [this.validateId, this.update]);
-        application.del('/restaurants/:id', [this.validateId, this.delete]);
+        application.get(`${this.basePath}`, this.findAll);
+        application.get(`${this.basePath}/:id`, [this.validateId, this.findById]);
+        application.post(`${this.basePath}`, this.save);
+        application.put(`${this.basePath}/:id`, [this.validateId, this.replace]);
+        application.patch(`${this.basePath}/:id`, [this.validateId, this.update]);
+        application.del(`${this.basePath}/:id`, [this.validateId, this.delete]);
         //rotas para trabalhar com o sub documento Menu
-        application.get('/restaurants/:id/menu', [this.validateId, this.findMenu]);
-        application.put('/restaurants/:id/menu', [this.validateId, this.replaceMenu]);
+        application.get(`${this.basePath}/:id/menu`, [this.validateId, this.findMenu]);
+        application.put(`${this.basePath}/:id/menu`, [this.validateId, this.replaceMenu]);
     }
 }
 exports.restaurantRouter = new RestaurantRouter();
