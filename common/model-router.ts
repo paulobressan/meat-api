@@ -7,6 +7,8 @@ import { NotFoundError } from 'restify-errors';
 //o tipo de model que essa classe recebera, para isso temos que tornar generico a nossa classe com D extends mongoose.docuemnt
 export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     basePath: string;
+    //Propriedade para definir o tamanho de registro devolvido
+    pageSize: number = 2;
 
     //É necessario passar no construtor o model que sera utilizado
     constructor(protected model: mongoose.Model<D>) {
@@ -24,6 +26,32 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     //metodo para preparar query da consulta todos documentos
     protected prepareAll(query: mongoose.DocumentQuery<D[], D>): mongoose.DocumentQuery<D[], D> {
         return query;
+    }
+
+    //envelopando os documentos, e adicionando links para proxima pagina e pagina anterior e 
+    //quantidade de itens
+    envelopeAll(documents: any[], options: any = {}): any {
+        //resource é o objeto envelopado
+        const resource: any = {
+            //links de controle de paginação
+            _links: {
+                self: options.url
+            },
+            //schemas solicitados
+            items: documents
+        }
+        //opções para paginação
+        if (options.page && options.count && options.pageSize) {
+            if (options.page > 1) {
+                resource._links.previous = `${this.basePath}?_page=${options.page - 1}`
+            }
+            //Se remaing(proximos itens) for maior do que 0, existe itens para a proxima pagina
+            //Se não, não sera renderizado o link next 
+            const remaing = options.count - (options.page * options.pageSize)
+            if (remaing > 0)
+                resource._links.next = `${this.basePath}?_page=${options.page + 1}`
+        }
+        return resource;
     }
 
     //sobreescrevendo o metodo envelope para envelopar alguns dados(HYPERMEDIA)
@@ -46,12 +74,30 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     }
 
     //Abstraindo o find all
+    //Pode-se paginar com o metodo limit
     findAll = (req, resp, next) => {
-        this.prepareAll(this.model.find())
-            .then(
-                //metodo herdado de Router
-                this.renderAll(resp, next)
-            ).catch(next)
+        //passando a pagina no parametro
+        let page = parseInt(req.query._page || 1)
+
+        //Se não for enviado a pagina, a pagina default é 1.
+        page = page > 0 ? page : 1
+
+        //Skip é quantos registros ele vai pular para começar a nova pagina.
+        let skip = this.pageSize * (page - 1);
+
+        //pegando o count da coleção
+        this.model
+            .count({}).exec()
+            .then(count => this.prepareAll(this.model.find())
+                //Pulando os registro de acordo com a pagina
+                .skip(skip)
+                //limite de registro
+                .limit(this.pageSize)
+                .then(
+                    //metodo herdado de Router, passando uma options para que possa ser utilizado na paginação
+                    this.renderAll(resp, next, { page, count, pageSize: this.pageSize, url: req.url })
+                ))
+            .catch(next)
     }
 
     findById = (req, resp, next) => {
@@ -88,7 +134,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
                     //Se não aplicar a alteração no documento é porque o documento não existe.
                     throw new NotFoundError('Documento não encontrado');
                 //Se o documento foi alterado, vamos retornar o documento alterado
-                return this.prepareOne(this.model.findById(req.params.id));
+                return result;
             })
             .then(this.render(resp, next))
             .catch(next)

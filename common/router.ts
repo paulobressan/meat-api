@@ -11,15 +11,19 @@ export abstract class Router extends EventEmitter {
     abstract applyRoutes(application: restify.Server);
 
     //criado para pegar os dados do documento e adicionar mais dados no documento
-    envelope(document: any){
+    envelope(document: any) {
         return document;
+    }
+
+    //Envelopando uma lista de documentos para aplicar links de paginação, como proxima pagina e anterior
+    envelopeAll(documents: any[], options: any = {}): any {
+        return documents;
     }
 
     //metodo responsavel por centralizar os retorno do end-point
     render(response: restify.Response, next: restify.Next) {
         return (document) => {
-            if (document)
-            {
+            if (document) {
                 //Quando formos retornar os dados para o cliente e queremos criar uma formatação, por exemplo
                 //retirar campos para não exibir para o cliente, temos que escutar um evento antes de retornar
                 //portanto é emitido nessa função e quem chamou escuta o evento
@@ -34,18 +38,19 @@ export abstract class Router extends EventEmitter {
 
     //O render all é especifico para retornar listas. O render não suporta retornar listas, 
     //portanto temos que criar um novo metodo que trate retorno de lista.
-    renderAll(response: restify.Response, next: restify.Next){
+    renderAll(response: restify.Response, next: restify.Next, options: any = {}) {
         return (documents: any[]) => {
-            if(documents){
+            if (documents) {
                 documents.forEach((document, index, array) => {
                     this.emit('beforeRender', document);
                     //Para cada documento vamos envelopar dados auxiliares
                     array[index] = this.envelope(document);
                 });
-                response.json(documents);
-            }else
-                response.json([]);   
-            return next();        
+                //REtornando e envelopando os documentos para adicionar a paginação
+                response.json(this.envelopeAll(documents, options));
+            } else
+                response.json(this.envelopeAll([]));
+            return next();
         }
     }
 }

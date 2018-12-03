@@ -11,6 +11,8 @@ class ModelRouter extends router_1.Router {
     constructor(model) {
         super();
         this.model = model;
+        //Propriedade para definir o tamanho de registro devolvido
+        this.pageSize = 2;
         //validar o ID se esta no formato correto
         //essa função é utilizada nas rotas, onde a rota suporta um array de callback, portanto temos uma sequença de execução
         //primeiro callback é o validateId porque se o id não for valido vamos retornar um 404 se não podemos ir para o proximo callback.
@@ -21,11 +23,26 @@ class ModelRouter extends router_1.Router {
             next();
         };
         //Abstraindo o find all
+        //Pode-se paginar com o metodo limit
         this.findAll = (req, resp, next) => {
-            this.prepareAll(this.model.find())
+            //passando a pagina no parametro
+            let page = parseInt(req.query._page || 1);
+            //Se não for enviado a pagina, a pagina default é 1.
+            page = page > 0 ? page : 1;
+            //Skip é quantos registros ele vai pular para começar a nova pagina.
+            let skip = this.pageSize * (page - 1);
+            //pegando o count da coleção
+            this.model
+                .count({}).exec()
+                .then(count => this.prepareAll(this.model.find())
+                //Pulando os registro de acordo com a pagina
+                .skip(skip)
+                //limite de registro
+                .limit(this.pageSize)
                 .then(
-            //metodo herdado de Router
-            this.renderAll(resp, next)).catch(next);
+            //metodo herdado de Router, passando uma options para que possa ser utilizado na paginação
+            this.renderAll(resp, next, { page, count, pageSize: this.pageSize, url: req.url })))
+                .catch(next);
         };
         this.findById = (req, resp, next) => {
             //usando o metodo prepareOne para que possa ser personalizada a query da consulta
@@ -57,7 +74,7 @@ class ModelRouter extends router_1.Router {
                     //Se não aplicar a alteração no documento é porque o documento não existe.
                     throw new restify_errors_1.NotFoundError('Documento não encontrado');
                 //Se o documento foi alterado, vamos retornar o documento alterado
-                return this.prepareOne(this.model.findById(req.params.id));
+                return result;
             })
                 .then(this.render(resp, next))
                 .catch(next);
@@ -100,6 +117,31 @@ class ModelRouter extends router_1.Router {
     //metodo para preparar query da consulta todos documentos
     prepareAll(query) {
         return query;
+    }
+    //envelopando os documentos, e adicionando links para proxima pagina e pagina anterior e 
+    //quantidade de itens
+    envelopeAll(documents, options = {}) {
+        //resource é o objeto envelopado
+        const resource = {
+            //links de controle de paginação
+            _links: {
+                self: options.url
+            },
+            //schemas solicitados
+            items: documents
+        };
+        //opções para paginação
+        if (options.page && options.count && options.pageSize) {
+            if (options.page > 1) {
+                resource._links.previous = `${this.basePath}?_page=${options.page - 1}`;
+            }
+            //Se remaing(proximos itens) for maior do que 0, existe itens para a proxima pagina
+            //Se não, não sera renderizado o link next 
+            const remaing = options.count - (options.page * options.pageSize);
+            if (remaing > 0)
+                resource._links.next = `${this.basePath}?_page=${options.page + 1}`;
+        }
+        return resource;
     }
     //sobreescrevendo o metodo envelope para envelopar alguns dados(HYPERMEDIA)
     envelope(document) {

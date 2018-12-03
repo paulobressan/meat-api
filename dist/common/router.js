@@ -11,6 +11,10 @@ class Router extends events_1.EventEmitter {
     envelope(document) {
         return document;
     }
+    //Envelopando uma lista de documentos para aplicar links de paginação, como proxima pagina e anterior
+    envelopeAll(documents, options = {}) {
+        return documents;
+    }
     //metodo responsavel por centralizar os retorno do end-point
     render(response, next) {
         return (document) => {
@@ -28,7 +32,7 @@ class Router extends events_1.EventEmitter {
     }
     //O render all é especifico para retornar listas. O render não suporta retornar listas, 
     //portanto temos que criar um novo metodo que trate retorno de lista.
-    renderAll(response, next) {
+    renderAll(response, next, options = {}) {
         return (documents) => {
             if (documents) {
                 documents.forEach((document, index, array) => {
@@ -36,10 +40,11 @@ class Router extends events_1.EventEmitter {
                     //Para cada documento vamos envelopar dados auxiliares
                     array[index] = this.envelope(document);
                 });
-                response.json(documents);
+                //REtornando e envelopando os documentos para adicionar a paginação
+                response.json(this.envelopeAll(documents, options));
             }
             else
-                response.json([]);
+                response.json(this.envelopeAll([]));
             return next();
         };
     }
