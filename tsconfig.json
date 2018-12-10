@@ -4,5 +4,9 @@
         "target": "es6",
         "module": "commonjs",
         "sourceMap": true
-    }
+    },
+    //Qualquer arquivo que terminar com .test.ts não sera compilado pelo typescript
+    "exclude": [
+        "**/*.test.ts"
+    ]
 }
