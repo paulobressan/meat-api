@@ -21,12 +21,17 @@ export class Server {
         (<any>mongoose).Promise = global.Promise;
         //criando conexão com o mongo pegando a url statica no environment
         return mongoose.connect(environment.db.url, {
-            useMongoClient: true
-        });
+            //Usar persistencia atualizada mongoose
+            useNewUrlParser: true,
+            //Indexar subdocumentos de coleções que tem sub documentos
+            useCreateIndex: true,
+            //Remover suporte a metodos descontinuada da aplicação no mongoose
+            useFindAndModify: false
+        })
     }
 
     //propriedade que vai armazenar o servidor de aplicação, com ela podemso acessar o servidor em outras classe
-    application: restify.Server;
+    application: restify.Server
 
     //metodo que vai iniciar o servidor
     initRoutes(routers: Router[]): Promise<any> {
@@ -37,13 +42,13 @@ export class Server {
                 this.application = restify.createServer({
                     name: 'meat-api',
                     version: '1.0.0'
-                });
+                })
 
                 //Configurando um plugin para capturar os valores passado na url
-                this.application.use(restify.plugins.queryParser());
+                this.application.use(restify.plugins.queryParser())
 
                 //Configurando um plugin para converter o body em objetos json
-                this.application.use(restify.plugins.bodyParser());
+                this.application.use(restify.plugins.bodyParser())
 
                 //Usando a função de conversão de merge-patch+json criada e importada 
                 this.application.use(mergePatchBodyParser);
@@ -54,17 +59,17 @@ export class Server {
                 //que é subscrito pelas rotas filhas, temos que passar a aplicação para que a rota filha possa criar suas
                 //rotas e aqui no initRoute definirmos elas.
                 for (let router of routers) {
-                    router.applyRoutes(this.application);
+                    router.applyRoutes(this.application)
                 }
 
                 //Esctuando o servidor na porta 3000
                 this.application.listen(environment.server.port, () => {
                     //se tudoder certo a promisse retorna o servidor pronto e configurado.
-                    resolve(this.application);
+                    resolve(this.application)
                 });
 
                 //criando um evento para que ele fique escutando os erros da aplicação se houver vai ser chamado o callback handleErro criado para retornar um json
-                this.application.on('restifyError', handleError);
+                this.application.on('restifyError', handleError)
 
                 //Para verificar se houve error ao escutar o servidor em algumar porta, é necessario se inscrever no servidor
                 //e criar um evento de error para escutar se houver algum erro
@@ -72,7 +77,7 @@ export class Server {
                 //     console.log(err);
                 // })
             } catch (error) {
-                reject(error);
+                reject(error)
             }
         })
     }
@@ -82,11 +87,11 @@ export class Server {
     bootstrap(routers: Router[] = []): Promise<Server> {
         //iniciar rotas e servidor se a conexão com o banco for sucedida
         return this.initializeDb().then(() =>
-            this.initRoutes(routers).then(() => this));
+            this.initRoutes(routers).then(() => this))
     }
 
     //Fechar o servidor e fechar a conexão com o banco
-    shutdown()  {
+    shutdown() {
         return mongoose.disconnect().then(() => this.application.close())
     }
 }

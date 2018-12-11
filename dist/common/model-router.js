@@ -33,7 +33,7 @@ class ModelRouter extends router_1.Router {
             let skip = this.pageSize * (page - 1);
             //pegando o count da coleção
             this.model
-                .count({}).exec()
+                .countDocuments({}).exec()
                 .then(count => this.prepareAll(this.model.find())
                 //Pulando os registro de acordo com a pagina
                 .skip(skip)
@@ -65,12 +65,12 @@ class ModelRouter extends router_1.Router {
             };
             //por padrão o update sempre altera os dados parcialmente e no caso abaixo
             //queremos alterar todas prop do documento com as prop do body recebida
-            this.model.update({ _id: req.params.id }, req.body, options)
+            this.model.findOneAndUpdate({ _id: req.params.id }, req.body, options)
                 //o update retorna uma query e temos que executar essa query para poder aplicar a promisse
                 .exec()
                 .then(result => {
                 //Se o documento foi subscrevido
-                if (result.n)
+                if (result.isModified)
                     //Se não aplicar a alteração no documento é porque o documento não existe.
                     throw new restify_errors_1.NotFoundError('Documento não encontrado');
                 //Se o documento foi alterado, vamos retornar o documento alterado
@@ -96,11 +96,11 @@ class ModelRouter extends router_1.Router {
         this.delete = (req, resp, next) => {
             //como não queremos retornar nada depois que remover, podemos simplesmente usar o metodo remove
             //Se for preciso retorna podemos utilizar o metodo findByIdAndRemove
-            this.model.remove({ _id: req.params.id })
+            this.model.findOneAndDelete({ _id: req.params.id })
                 .exec()
-                .then((result) => {
+                .then(result => {
                 //Se o algum documento foi afetado
-                if (!result.n)
+                if (!result.isDeleted)
                     //Se não é porque não encontrou nenhum documento com o id passado
                     throw new restify_errors_1.NotFoundError('Documento não encontrado');
                 return next();

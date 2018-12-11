@@ -27,7 +27,7 @@ beforeAll(() => {
     //a aplicação espere o servidor terminar e continuar a testar
     return server.bootstrap([usersRouters])
         //Como é uma base de teste, temos que iniciar ela limpa para não gerar erros
-        .then(() => User.remove({}).exec())
+        .then(() => User.deleteMany({}).exec())
         //Se der algum erro, vamos logar esse erro
         .catch(console.error)
 })

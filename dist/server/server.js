@@ -18,7 +18,12 @@ class Server {
         mongoose.Promise = global.Promise;
         //criando conexão com o mongo pegando a url statica no environment
         return mongoose.connect(environment_1.environment.db.url, {
-            useMongoClient: true
+            //Usar persistencia atualizada mongoose
+            useNewUrlParser: true,
+            //Indexar subdocumentos de coleções que tem sub documentos
+            useCreateIndex: true,
+            //Remover suporte a metodos descontinuada da aplicação no mongoose
+            useFindAndModify: false
         });
     }
     //metodo que vai iniciar o servidor
@@ -68,6 +73,10 @@ class Server {
     bootstrap(routers = []) {
         //iniciar rotas e servidor se a conexão com o banco for sucedida
         return this.initializeDb().then(() => this.initRoutes(routers).then(() => this));
+    }
+    //Fechar o servidor e fechar a conexão com o banco
+    shutdown() {
+        return mongoose.disconnect().then(() => this.application.close());
     }
 }
 exports.Server = Server;
