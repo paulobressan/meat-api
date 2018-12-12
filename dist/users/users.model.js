@@ -55,8 +55,22 @@ const userSchema = new mongoose.Schema({
 });
 //Metodos personalizados no model
 //O mongoose recomenda usar function e não arrow function pelo fato do escopo
-userSchema.statics.findByEmail = function (email) {
-    return this.findOne({ email });
+//Esse metodo é associado com o modelo, ou seja ele vai trabalhar sem usar o resto do contexto, por exemplo
+//Ele vai fazer a busca e retornar os valores e nada mais
+userSchema.statics.findByEmail = function (email, projection) {
+    //O projection é uma configuração onde solicitamos o retorno do password
+    //Foi definido select: false para não retornar o password no body
+    return this.findOne({ email }, projection);
+};
+//Metodo de instancia, ele compara uma instancia que foi criada, pode ser um retorno de um model que é resultado de uma busca
+//e com podemos trabalhar na instancia retornada, por exemplo validar um dado enviado de fora com o dado
+//que esta na instancia, é o que esse metodo abaixo faz
+//Compara o password do documento com um password passado
+userSchema.methods.matches = function (password) {
+    //o bcrypt tem a função compareSync que por sua vez ela pega o valor passado, 
+    //simula a criptografia e compara a criptografia do contexto com a que foi passada
+    //retornando true ou false
+    return bcrypt.compareSync(password, this.password);
 };
 // MIDDLEWARE's
 // criando uma função que crie um hash criptografado do password

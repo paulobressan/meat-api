@@ -12,7 +12,9 @@ exports.environment = {
     },
     security: {
         //Clicos que o bcrypt utilizadara para colocar uma informação dinamica para poder gerar o hash
-        saltRounds: process.env.SALT_ROUNDS || 10
+        saltRounds: process.env.SALT_ROUNDS || 10,
+        //chave secreta do jwt
+        apiSecret: process.env.API_SECRET || 'meat-api-secret'
     }
 };
 //# sourceMappingURL=environment.js.map

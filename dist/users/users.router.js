@@ -4,6 +4,8 @@ const restify = require("restify");
 const model_router_1 = require("../common/model-router");
 //importando o model de usuarios
 const users_model_1 = require("../users/users.model");
+//Arquivo de autenticação
+const auth_handler_1 = require("../security/auth.handler");
 //classe que define rotas de usuarios
 //extende para ModelRouter que abstrai os acesso ao banco de dados escolhendo o tipo da classe.
 class UsersRouter extends model_router_1.ModelRouter {
@@ -66,6 +68,8 @@ class UsersRouter extends model_router_1.ModelRouter {
         //e enviar.
         application.patch(`${this.basePath}/:id`, [this.validateId, this.update]);
         application.del(`${this.basePath}/:id`, [this.validateId, this.delete]);
+        //Rota para o usuário se autenticar
+        application.post(`${this.basePath}/authenticate`, auth_handler_1.authenticate);
     }
 }
 //quem chamar essa classe vai receber uma instancia pronta para utilizar
