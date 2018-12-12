@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const model_router_1 = require("../common/model-router");
 //importando o model de usuarios
-const reviews_module_1 = require("../reviews/reviews.module");
+const reviews_model_1 = require("./reviews.model");
 class ReviewRouter extends model_router_1.ModelRouter {
     constructor() {
-        super(reviews_module_1.Review);
+        super(reviews_model_1.Review);
     }
     //Envelopando links personalizados, individual
     //Criando links para acessar restaurant e user

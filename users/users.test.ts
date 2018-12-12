@@ -7,30 +7,30 @@ import { usersRouters } from '../users/users.router';
 import { User } from './users.model';
 
 //Caminho do servidor
-let address: string;
+let address: string = (<any>global).address
 
 //Para realizar os teste em uma base de homologação, temos que configurar uma instancia especial para isso
 //O beforeAll faz isso antes que tudo aconteça
 //vamos criar um novo servidor de test e um novo banco
-let server: Server
-beforeAll(() => {
-    //alterando a url na execução do teste para a nova url de test
-    environment.db.url = process.env.DB_URL || 'mongodb://localhost/meat-api-test-db'
-    environment.server.port = process.env.SERVER_PORT || 3001
+// let server: Server
+// beforeAll(() => {
+//     //alterando a url na execução do teste para a nova url de test
+//     environment.db.url = process.env.DB_URL || 'mongodb://localhost/meat-api-test-db'
+//     environment.server.port = process.env.SERVER_PORT || 3001
 
-    //definindo o caminho do servidor
-    address = `http://localhost:${environment.server.port}`
+//     //definindo o caminho do servidor
+//     address = `http://localhost:${environment.server.port}`
 
-    server = new Server()
+//     server = new Server()
 
-    //Como estamos trabalhando com promisse e ela é assincrona, temos que retorna-la para que
-    //a aplicação espere o servidor terminar e continuar a testar
-    return server.bootstrap([usersRouters])
-        //Como é uma base de teste, temos que iniciar ela limpa para não gerar erros
-        .then(() => User.deleteMany({}).exec())
-        //Se der algum erro, vamos logar esse erro
-        .catch(console.error)
-})
+//     //Como estamos trabalhando com promisse e ela é assincrona, temos que retorna-la para que
+//     //a aplicação espere o servidor terminar e continuar a testar
+//     return server.bootstrap([usersRouters])
+//         //Como é uma base de teste, temos que iniciar ela limpa para não gerar erros
+//         .then(() => User.deleteMany({}).exec())
+//         //Se der algum erro, vamos logar esse erro
+//         .catch(console.error)
+// })
 
 //configurando o teste com Jest, o nome e a logica do test
 //testando um get em users
@@ -132,7 +132,7 @@ test('patch /users/:id', () => {
         .catch(fail)
 })
 
-//Depois de tudo vamos desligar o servidor
-afterAll(() => {
-    server.shutdown()
-})
+// //Depois de tudo vamos desligar o servidor
+// afterAll(() => {
+//     server.shutdown()
+// })

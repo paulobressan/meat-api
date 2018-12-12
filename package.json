@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "ts-node jest.startup.ts"
   },
   "repository": {
     "type": "git",
@@ -13,6 +13,9 @@
   "author": "",
   "license": "ISC",
   "jest": {
+    "globals":{
+      "address":"http://localhost:3001"
+    },
     "testEnvironment": "node",
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
@@ -40,12 +43,15 @@
   "devDependencies": {
     "@types/bcrypt": "^2.0.0",
     "@types/jest": "23.3.10",
+    "@types/jest-cli": "^23.6.0",
     "@types/mongoose": "^5.2.3",
     "@types/restify": "^7.2.3",
     "@types/supertest": "2.0.7",
     "jest": "23.6.0",
+    "jest-cli": "23.6.0",
     "supertest": "3.3.0",
     "ts-jest": "23.10.5",
+    "ts-node": "7.0.1",
     "typescript": "3.2.1"
   }
 }

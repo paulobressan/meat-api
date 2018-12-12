@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import { Restaurant } from '../restaurants/restaurants.module';
+import { Restaurant } from '../restaurants/restaurants.model';
 import { User } from '../users/users.model';
 
 //MODULO EXEMPLOS DE REFERENCIAS DE DOCUMENTOS

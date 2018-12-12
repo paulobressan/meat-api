@@ -2,25 +2,25 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const model_router_1 = require("../common/model-router");
 //importando o model de restaurante
-const restaurants_module_1 = require("../restaurants/restaurants.module");
+const restaurants_model_1 = require("./restaurants.model");
 //gerenciado de erros do restify
 const restify_errors_1 = require("restify-errors");
 class RestaurantRouter extends model_router_1.ModelRouter {
     constructor() {
-        super(restaurants_module_1.Restaurant);
+        super(restaurants_model_1.Restaurant);
         //O ModelRouter conta com chamdas "Padrões" que todo model usa, porem quando temos que realizar 
         //uma consulta especifica temos que criar uma função especifica para isso.
         this.findMenu = (req, resp, next) => {
             //O findbyid podemos incluir projeções que queremos criar ou devolver
             //No caso o menu esta setado para que ao buscar não devolver o menu, porem
             //vamos definir uma projeção para que ao buscar o restaurante traga o menu
-            restaurants_module_1.Restaurant.findById(req.params.id, "+menu")
+            restaurants_model_1.Restaurant.findById(req.params.id, "+menu")
                 .then(this.render(resp, next))
                 .catch(next);
         };
         //replace de menu
         this.replaceMenu = (req, resp, next) => {
-            restaurants_module_1.Restaurant.findById(req.params.id)
+            restaurants_model_1.Restaurant.findById(req.params.id)
                 .then(rest => {
                 if (!rest)
                     throw new restify_errors_1.NotFoundError('Documento não encontrado');

@@ -29,6 +29,9 @@ exports.handleError = (req, resp, err, done) => {
             }
             //substituir o toJSON para retornar a lista de erros
             err.toJSON = () => ({
+                //mensagem de erro que pode ser personalizada
+                message: 'Validation error while processing your request',
+                //erros
                 errors: messages
             });
             break;

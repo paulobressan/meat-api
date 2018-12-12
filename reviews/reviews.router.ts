@@ -1,7 +1,7 @@
 import * as restify from 'restify';
 import { ModelRouter } from '../common/model-router';
 //importando o model de usuarios
-import { Review } from '../reviews/reviews.module';
+import { Review } from './reviews.model';
 import * as mongoose from 'mongoose';
 
 class ReviewRouter extends ModelRouter<Review> {

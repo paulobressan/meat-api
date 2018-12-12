@@ -32,7 +32,15 @@ export abstract class Router extends EventEmitter {
             }
             else
                 throw new NotFoundError('Documento não encontrado');
-            return next();
+            //Ao passar o false para o next, informamos para o restify não executar mais nenhuma
+            //callback, foi necessario por causa da versão 2.0.0 do get de users, nele tem duas callback
+            //findByEmail e findAll, se o findByEmail renderizar o findAll tambem ia ser executado sobreescrevendo
+            //a resposta correta do primeiro callback
+            //para isso o next(false) não pressegue com o callnack.
+            //O next espera como parametro 2 opção a primeira é um error que assim ele sobe o error para
+            //o hendler, a segunda é se desejamos prosseguir para outros callbacks e se não passar nada
+            //vamos prosseguir normalmente
+            return next(false)
         }
     }
 
