@@ -8,6 +8,8 @@ const server_1 = require("./server/server");
 const users_model_1 = require("./users/users.model");
 const reviews_router_1 = require("./reviews/reviews.router");
 const reviews_model_1 = require("./reviews/reviews.model");
+const restaurants_router_1 = require("./restaurants/restaurants.router");
+const restaurants_model_1 = require("./restaurants/restaurants.model");
 //Classe responsavel por definir as configurações globais dos arquivos de testes
 //Para realizar os teste em uma base de homologação, temos que configurar uma instancia especial para isso
 //O beforeAll faz isso antes que tudo aconteça
@@ -22,11 +24,13 @@ const beforeAllTests = () => {
     //a aplicação espere o servidor terminar e continuar a testar
     return server.bootstrap([
         users_router_1.usersRouters,
-        reviews_router_1.reviewsRouter
+        reviews_router_1.reviewsRouter,
+        restaurants_router_1.restaurantRouter
     ])
         //Como é uma base de teste, temos que iniciar ela limpa para não gerar erros
         .then(() => users_model_1.User.deleteMany({}).exec())
         .then(() => reviews_model_1.Review.deleteMany({}).exec())
+        .then(() => restaurants_model_1.Restaurant.deleteMany({}).exec())
         //Se der algum erro, vamos logar esse erro
         .catch(console.error);
 };
