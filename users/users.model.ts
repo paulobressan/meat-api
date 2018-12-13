@@ -14,7 +14,12 @@ export interface User extends mongoose.Document {
     password: string,
     gender: string,
     cpf: string,
-    matches(password: string): boolean
+    //perfils associados ao usuários
+    profiles: string[],
+    matches(password: string): boolean,
+    //Função responsavel por checar se o usuário tem o perfil que foi passado
+    //hasAny(['admin','user'])
+    hasAny(...profiles: string[]): boolean
 }
 
 //Usando a interface para utilziar metodos personalizados
@@ -67,6 +72,10 @@ const userSchema = new mongoose.Schema({
             message: '{PATH}: Invalid CPF ({VALUE})'
         }
         //validador personalizado
+    },
+    profiles: {
+        type: [String],
+        required: false
     }
 });
 
@@ -90,7 +99,12 @@ userSchema.methods.matches = function (password: string): boolean {
     //retornando true ou false
     return bcrypt.compareSync(password, this.password)
 }
-
+//Metodo de instancia para analizar se o usuário contem algum dos profile necessitado
+userSchema.methods.hasAny = function (...profiles: string[]){
+    //Se qualquer valor que tiver no profiles passado como parametro estiver na instancia o usuário
+    //Se tiver o valor de some vai ser um boolean
+    return profiles.some(profile => this.profiles.indexOf(profile)!= -1)
+}
 
 // MIDDLEWARE's
 

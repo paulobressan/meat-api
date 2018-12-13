@@ -10,6 +10,7 @@ const mongoose = require("mongoose");
 const merge_patch_parser_1 = require("./merge-patch.parser");
 //arquivo de erro
 const error_handler_1 = require("./error.handler");
+const token_parser_1 = require("../security/token.parser");
 //Configurando classe que vai iniciar o servidor
 class Server {
     //metodo que inicializa a conexão com mongo
@@ -42,6 +43,11 @@ class Server {
                 this.application.use(restify.plugins.bodyParser());
                 //Usando a função de conversão de merge-patch+json criada e importada 
                 this.application.use(merge_patch_parser_1.mergePatchBodyParser);
+                //Associando o tokenParser a todas requisições
+                //Toda requisição que for feita, vai passar pelo tokenParser que por sua vez vai pegar
+                //o header da requisição capturar o authorization e decodificar o token, em nenhum momento travamos a requisição
+                //Por que podemos ter rotas que não vai precisar do token
+                this.application.use(token_parser_1.tokenParser);
                 //Adicionando arquivos de rotas
                 //percorrendo o array de rotas recebido pelo bootstrap e passada para o initRoutes
                 //aplica-las na aplicação, as rotas herda de Route que é abstrata e tem o metodo abstrato applyRoute

@@ -11,6 +11,8 @@ import { mergePatchBodyParser } from './merge-patch.parser';
 //arquivo de erro
 import { handleError } from './error.handler';
 
+import { tokenParser } from '../security/token.parser'
+
 
 //Configurando classe que vai iniciar o servidor
 export class Server {
@@ -51,7 +53,13 @@ export class Server {
                 this.application.use(restify.plugins.bodyParser())
 
                 //Usando a função de conversão de merge-patch+json criada e importada 
-                this.application.use(mergePatchBodyParser);
+                this.application.use(mergePatchBodyParser)
+
+                //Associando o tokenParser a todas requisições
+                //Toda requisição que for feita, vai passar pelo tokenParser que por sua vez vai pegar
+                //o header da requisição capturar o authorization e decodificar o token, em nenhum momento travamos a requisição
+                //Por que podemos ter rotas que não vai precisar do token
+                this.application.use(tokenParser)
 
                 //Adicionando arquivos de rotas
                 //percorrendo o array de rotas recebido pelo bootstrap e passada para o initRoutes

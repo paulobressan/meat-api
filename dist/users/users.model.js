@@ -51,6 +51,10 @@ const userSchema = new mongoose.Schema({
             message: '{PATH}: Invalid CPF ({VALUE})'
         }
         //validador personalizado
+    },
+    profiles: {
+        type: [String],
+        required: false
     }
 });
 //Metodos personalizados no model
@@ -71,6 +75,12 @@ userSchema.methods.matches = function (password) {
     //simula a criptografia e compara a criptografia do contexto com a que foi passada
     //retornando true ou false
     return bcrypt.compareSync(password, this.password);
+};
+//Metodo de instancia para analizar se o usuário contem algum dos profile necessitado
+userSchema.methods.hasAny = function (...profiles) {
+    //Se qualquer valor que tiver no profiles passado como parametro estiver na instancia o usuário
+    //Se tiver o valor de some vai ser um boolean
+    return profiles.some(profile => this.profiles.indexOf(profile) != -1);
 };
 // MIDDLEWARE's
 // criando uma função que crie um hash criptografado do password
