@@ -80,7 +80,7 @@ userSchema.methods.matches = function (password) {
 userSchema.methods.hasAny = function (...profiles) {
     //Se qualquer valor que tiver no profiles passado como parametro estiver na instancia o usuário
     //Se tiver o valor de some vai ser um boolean
-    return profiles.some(profile => this.profiles.indexOf(profile) != -1);
+    return profiles.some(profile => this.profiles.indexOf(profile) !== -1);
 };
 // MIDDLEWARE's
 // criando uma função que crie um hash criptografado do password

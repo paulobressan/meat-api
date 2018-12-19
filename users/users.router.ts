@@ -4,6 +4,8 @@ import { ModelRouter } from '../common/model-router';
 import { User } from '../users/users.model';
 //Arquivo de autenticação
 import { authenticate } from '../security/auth.handler'
+import { authorize } from '../security/authz.handler';
+import { validateUserId } from '../security/validate-user-id.handler';
 
 //classe que define rotas de usuarios
 //extende para ModelRouter que abstrai os acesso ao banco de dados escolhendo o tipo da classe.
@@ -52,27 +54,30 @@ class UsersRouter extends ModelRouter<User> {
         //Versionando a rota de busca de usuário.
         //o cliente tem que informar a versão ou o restify vai pegar a mais atual
         application.get(`${this.basePath}`, restify.plugins.conditionalHandler([
-            { version: '1.0.0', handler: this.findAll },
-            { version: '2.0.0', handler: [this.findByEmail, this.findAll] }
+            { version: '1.0.0', handler: [authorize('admin'), this.findAll] },
+            //A função AUTHORIZE fornece que perfil de usuario pode acessar esse recurso
+            //Se o usuário não estiver logado ou não tiver a permissão, sera retornado
+            //Permission denied
+            { version: '2.0.0', handler: [authorize('admin'), this.findByEmail, this.findAll] }
         ]));
         //Todo metodo pode conter mais de um callback, para que o mongoose suporte, temos que adicionar um array de callback
         //Somente utilizar o validate id onde tem como parametro o id
-        application.get(`${this.basePath}/:id`, [this.validateId, this.findById]);
+        application.get(`${this.basePath}/:id`, [authorize('admin'), this.validateId, this.findById]);
         //criando um usuário via post
         application.post(`${this.basePath}`, this.save);
         //realizando um put
         //o id do documento é imutavel depois de ser criado, porem podemos definir o id antes de ser criado
-        application.put(`${this.basePath}/:id`, [this.validateId, this.replace]);
+        application.put(`${this.basePath}/:id`, [authorize('admin', 'user'), validateUserId(), this.validateId, this.replace]);
         //O tipo de dados enviado para o patch tem que ser merge- seguindo as boas praticas. Para isso 
         //o patch vai alterar somente a prop que enviarmos para ele. Ele é melhor que o put no caso de
         //alteração de um unico valor ou poucos valores porque não temos que forçar o client pegar o objeto atualizado
         //e enviar.
-        application.patch(`${this.basePath}/:id`, [this.validateId, this.update]);
-        application.del(`${this.basePath}/:id`, [this.validateId, this.delete]);
+        application.patch(`${this.basePath}/:id`, [authorize('admin', 'user'), validateUserId(), this.validateId, this.update]);
+        application.del(`${this.basePath}/:id`, [authorize('admin'), this.validateId, this.delete]);
 
         //Rota para o usuário se autenticar
         application.post(`${this.basePath}/authenticate`, authenticate)
-    } 
+    }
 }
 
 //quem chamar essa classe vai receber uma instancia pronta para utilizar

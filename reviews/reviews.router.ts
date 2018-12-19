@@ -3,6 +3,7 @@ import { ModelRouter } from '../common/model-router';
 //importando o model de usuarios
 import { Review } from './reviews.model';
 import * as mongoose from 'mongoose';
+import { authorize } from '../security/authz.handler';
 
 class ReviewRouter extends ModelRouter<Review> {
     constructor() {
@@ -11,7 +12,7 @@ class ReviewRouter extends ModelRouter<Review> {
 
     //Envelopando links personalizados, individual
     //Criando links para acessar restaurant e user
-    envelope(document:any){
+    envelope(document: any) {
         let resource = super.envelope(document);
         //pegando o restaurant id, o restaurant id pode ser o ID ou o restaurant populado, então temos que criar uma condição
         const restId = document.restaurant._id ? document.restaurant._id : document.restaurant;
@@ -26,8 +27,8 @@ class ReviewRouter extends ModelRouter<Review> {
         //retornando a query utilizada no findbyid.
         //a query é personalizada para que possamos trazer as referencias do documento referenciados.
         return query
-            .populate('user','name')
-            .populate('restaurant','name')
+            .populate('user', 'name')
+            .populate('restaurant', 'name')
     }
     //OU
     // findById = (req, resp, next) => {
@@ -42,7 +43,10 @@ class ReviewRouter extends ModelRouter<Review> {
     applyRoutes(application: restify.Server) {
         application.get(`${this.basePath}`, this.findAll);
         application.get(`${this.basePath}/:id`, [this.validateId, this.findById]);
-        application.post(`${this.basePath}`, this.save);
+        //A função AUTHORIZE fornece que perfil de usuario pode acessar esse recurso
+        //Se o usuário não estiver logado ou não tiver a permissão de user, sera retornado
+        //Permission denied
+        application.post(`${this.basePath}`, [authorize('user'), this.save]);
     }
 }
 

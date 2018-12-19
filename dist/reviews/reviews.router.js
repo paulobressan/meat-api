@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const model_router_1 = require("../common/model-router");
 //importando o model de usuarios
 const reviews_model_1 = require("./reviews.model");
+const authz_handler_1 = require("../security/authz.handler");
 class ReviewRouter extends model_router_1.ModelRouter {
     constructor() {
         super(reviews_model_1.Review);
@@ -38,7 +39,10 @@ class ReviewRouter extends model_router_1.ModelRouter {
     applyRoutes(application) {
         application.get(`${this.basePath}`, this.findAll);
         application.get(`${this.basePath}/:id`, [this.validateId, this.findById]);
-        application.post(`${this.basePath}`, this.save);
+        //A função AUTHORIZE fornece que perfil de usuario pode acessar esse recurso
+        //Se o usuário não estiver logado ou não tiver a permissão de user, sera retornado
+        //Permission denied
+        application.post(`${this.basePath}`, [authz_handler_1.authorize('user'), this.save]);
     }
 }
 exports.reviewsRouter = new ReviewRouter();
