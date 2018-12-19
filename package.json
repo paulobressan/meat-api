@@ -14,7 +14,8 @@
   "license": "ISC",
   "jest": {
     "globals": {
-      "address": "http://localhost:3001"
+      "address": "http://localhost:3001",
+      "auth": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBlbWFpbC5jb20iLCJpYXQiOjE1MTYyMzkwMjJ9.HCtLeNy5-33THRqf03ayTWV0UiTNEuBgKzE-G_03d3g"
     },
     "testEnvironment": "node",
     "transform": {
@@ -54,7 +55,7 @@
     "jest-cli": "23.6.0",
     "supertest": "3.3.0",
     "ts-jest": "23.10.5",
-    "ts-node": "7.0.1",
+    "ts-node": "5.0.1",
     "typescript": "3.2.1"
   }
 }

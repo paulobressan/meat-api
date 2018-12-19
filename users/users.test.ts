@@ -7,7 +7,9 @@ import { usersRouters } from '../users/users.router';
 import { User } from './users.model';
 
 //Caminho do servidor
-let address: string = (<any>global).address
+const address: string = (<any>global).address
+//Token do usuário criado no BeforeAll e gerado pelo jwt.io
+const auth: string = (<any>global).auth
 
 //Para realizar os teste em uma base de homologação, temos que configurar uma instancia especial para isso
 //O beforeAll faz isso antes que tudo aconteça
@@ -40,6 +42,8 @@ test('get /users', () => {
     //Realizando uma requisição get para testarmos
     return request(/**URL da aplicação de teste definida no beforeAll*/address)
         .get(/**Recurso da aplicação que dever ser testado*/'/users')
+        //Setando um header de autorização
+        .set('Authorization', auth)
         .then(response => {
             //regra de negocio do test
 
@@ -61,6 +65,8 @@ test('post /users', () => {
     //Realizando uma requisição get para testarmos
     return request(/**URL da aplicação de teste definida no beforeAll*/address)
         .post(/**Recurso da aplicação que dever ser testado*/'/users')
+        //Setando um header de autorização
+        .set('Authorization', auth)
         //Enviando um objeto para a inserção
         .send({
             name: 'usuario teste',
@@ -92,6 +98,8 @@ test('get /users/aaaaa - not found', () => {
     return request(address)
         //passando no conteudo um id invalido
         .get('/users/aaaaa')
+        //Setando um header de autorização
+        .set('Authorization', auth)
         .then(response => {
             expect(response.status).toBe(404)
         })
@@ -104,6 +112,8 @@ test('get /users/aaaaa - not found', () => {
 test('patch /users/:id', () => {
     return request(/**URL da aplicação de teste definida no beforeAll*/address)
         .post(/**Recurso da aplicação que dever ser testado*/'/users')
+        //Setando um header de autorização
+        .set('Authorization', auth)
         //Enviando um objeto para a inserção
         .send({
             name: 'usuario2 teste',

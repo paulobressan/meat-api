@@ -35,16 +35,21 @@ class Server {
         //Retornando uma promessa que o servidor vai ser iniciado
         return new Promise((resolve, reject) => {
             try {
-                //Configurando o servidor, nome e versão
-                this.application = restify.createServer({
+                //Opções para inicializar o servidor. É o objeto que a função createServer recebe
+                const options = {
                     name: 'meat-api',
-                    version: '1.0.0',
+                    version: '1.0.0'
+                };
+                //Se a certificação estiver ativa na environment, vamos adicionar na options
+                if (environment_1.environment.security.enableHTTPS) {
                     //Configurando um certificado https para testes
                     //o cert.pem é o certificado
-                    certificate: fs.readFileSync('./security/keys/cert.pem'),
+                    options.certificate = fs.readFileSync(environment_1.environment.security.certificate);
                     //key.pem é a chave de validação do certificado
-                    key: fs.readFileSync('./security/keys/key.pem')
-                });
+                    options.key = fs.readFileSync(environment_1.environment.security.key);
+                }
+                //Configurando o servidor, configurações de criação do servidor
+                this.application = restify.createServer(options);
                 //Configurando um plugin para capturar os valores passado na url
                 this.application.use(restify.plugins.queryParser());
                 //Configurando um plugin para converter o body em objetos json

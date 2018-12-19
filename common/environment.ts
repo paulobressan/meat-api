@@ -12,6 +12,12 @@ export const environment = {
         //Clicos que o bcrypt utilizadara para colocar uma informação dinamica para poder gerar o hash
         saltRounds: process.env.SALT_ROUNDS || 10,
         //chave secreta do jwt
-        apiSecret: process.env.API_SECRET || 'meat-api-secret'
+        apiSecret: process.env.API_SECRET || 'meat-api-secret',
+        //usar o certificado https de teste em desenvolvimento
+        enableHTTPS: process.env.ENABLE_HTTPS || false,
+        //Caminho do arquivo de certificado
+        certificate: process.env.CERTI_FILE || './security/keys/cert.pem',
+        //Caminho do arquivo de certificado key
+        key: process.env.CERTI_KEY_FILE ||'./security/keys/key.pem'
     }
 }

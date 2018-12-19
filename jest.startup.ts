@@ -33,6 +33,16 @@ const beforeAllTests = () => {
     ])
         //Como é uma base de teste, temos que iniciar ela limpa para não gerar erros
         .then(() => User.deleteMany({}).exec())
+        //Depois de limpar todos usuários, vamos criar um usuário para a autenticação do token
+        .then(() => {
+            //O teste é de um usuário que tem todas os profiles, mas podemos testar com varios usuários
+            let admin = new User();
+            admin.name = 'Admin';
+            admin.email = 'admin@email.com';
+            admin.password = '123456';
+            admin.profiles = ['admin', 'user'];
+            return admin.save();
+        })
         .then(() => Review.deleteMany({}).exec())
         .then(() => Restaurant.deleteMany({}).exec())
         //Se der algum erro, vamos logar esse erro
