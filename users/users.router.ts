@@ -22,6 +22,13 @@ class UsersRouter extends ModelRouter<User> {
         })
     }
 
+    //Teste de envelopamento
+    // envelope(document: any){
+    //     let resource = super.envelope(document);
+    //     resource.teste = "";
+    //     return resource;
+    // }
+
     //metodo para a segunda versão de busca de usuário
     findByEmail = (req: restify.Request, resp: restify.Response, next: restify.Next) => {
         //Se foi passado o email

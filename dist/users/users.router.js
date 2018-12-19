@@ -45,6 +45,11 @@ class UsersRouter extends model_router_1.ModelRouter {
             //delete document.password;
         });
     }
+    envelope(document) {
+        let resource = super.envelope(document);
+        resource.teste = "";
+        return resource;
+    }
     applyRoutes(application) {
         //No Model Router, foi criado o basePath que captura o nome da coleção de modelos e atribui para as rotas
         //Assim a rota tera o nome do modelo que esta no banco.
