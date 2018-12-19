@@ -10,9 +10,10 @@ import * as mongoose from 'mongoose';
 import { mergePatchBodyParser } from './merge-patch.parser';
 //arquivo de erro
 import { handleError } from './error.handler';
-
-import { tokenParser } from '../security/token.parser'
-
+//Handler para decodificar token e aplica lo na requisição
+import { tokenParser } from '../security/token.parser';
+//Manipulador de arquivo do node (File System)
+import * as fs from 'fs';
 
 //Configurando classe que vai iniciar o servidor
 export class Server {
@@ -43,7 +44,12 @@ export class Server {
                 //Configurando o servidor, nome e versão
                 this.application = restify.createServer({
                     name: 'meat-api',
-                    version: '1.0.0'
+                    version: '1.0.0',
+                    //Configurando um certificado https para testes
+                    //o cert.pem é o certificado
+                    certificate: fs.readFileSync('./security/keys/cert.pem'),
+                    //key.pem é a chave de validação do certificado
+                    key: fs.readFileSync('./security/keys/key.pem')
                 })
 
                 //Configurando um plugin para capturar os valores passado na url

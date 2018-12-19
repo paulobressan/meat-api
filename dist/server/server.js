@@ -10,7 +10,10 @@ const mongoose = require("mongoose");
 const merge_patch_parser_1 = require("./merge-patch.parser");
 //arquivo de erro
 const error_handler_1 = require("./error.handler");
+//Handler para decodificar token e aplica lo na requisição
 const token_parser_1 = require("../security/token.parser");
+//Manipulador de arquivo do node (File System)
+const fs = require("fs");
 //Configurando classe que vai iniciar o servidor
 class Server {
     //metodo que inicializa a conexão com mongo
@@ -35,7 +38,12 @@ class Server {
                 //Configurando o servidor, nome e versão
                 this.application = restify.createServer({
                     name: 'meat-api',
-                    version: '1.0.0'
+                    version: '1.0.0',
+                    //Configurando um certificado https para testes
+                    //o cert.pem é o certificado
+                    certificate: fs.readFileSync('./security/keys/cert.pem'),
+                    //key.pem é a chave de validação do certificado
+                    key: fs.readFileSync('./security/keys/key.pem')
                 });
                 //Configurando um plugin para capturar os valores passado na url
                 this.application.use(restify.plugins.queryParser());

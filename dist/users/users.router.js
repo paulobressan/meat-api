@@ -13,6 +13,12 @@ const validate_user_id_handler_1 = require("../security/validate-user-id.handler
 class UsersRouter extends model_router_1.ModelRouter {
     constructor() {
         super(users_model_1.User);
+        //Teste de envelopamento
+        // envelope(document: any){
+        //     let resource = super.envelope(document);
+        //     resource.teste = "";
+        //     return resource;
+        // }
         //metodo para a segunda versão de busca de usuário
         this.findByEmail = (req, resp, next) => {
             //Se foi passado o email
@@ -44,11 +50,6 @@ class UsersRouter extends model_router_1.ModelRouter {
             //temos tambem
             //delete document.password;
         });
-    }
-    envelope(document) {
-        let resource = super.envelope(document);
-        resource.teste = "";
-        return resource;
     }
     applyRoutes(application) {
         //No Model Router, foi criado o basePath que captura o nome da coleção de modelos e atribui para as rotas
