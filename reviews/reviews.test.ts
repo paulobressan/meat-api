@@ -3,8 +3,8 @@ import * as request from 'supertest'
 import { environment } from '../common/environment'
 
 //Caminho do servidor
-let address: string = (<any>global).address
-
+const address: string = (<any>global).address
+const auth: string = (<any>global).auth
 
 //configurando o teste com Jest, o nome e a logica do test
 //testando um get em users
@@ -25,5 +25,40 @@ test('get /reviews', () => {
         })
         //se o teste falhar, o erro sera passado para a função fail que é uma função global
         .catch(fail)
+})
 
+test('post /reviews', () => {
+    return request(address)
+        .post(/**Recurso da aplicação que dever ser testado*/'/users')
+        //Setando um header de autorização
+        .set('Authorization', auth)
+        //Enviando um objeto para a inserção
+        .send({
+            name: 'usuario teste',
+            email: 'usuariotestereviews@email.com',
+            password: '123456',
+            cpf: '505.025.080-35'
+        }).then(user => request(address)
+            .post('/restaurants')
+            .set('Authorization', auth)
+            .send({
+                name: 'Restaurants Teste'
+            })
+            .then(restaurant => request(address)
+                .post('/reviews')
+                .set('Authorization', auth)
+                .send({
+                    date: new Date(),
+                    rating: 5,
+                    comments: 'Muito Bom',
+                    restaurant: restaurant.body._id,
+                    user: user.body._id
+                }))
+        )
+        .then(response => {
+            expect(response.status).toBe(200)
+            expect(response.body.rating).toBe(5)
+            expect(response.body.comments).toBe('Muito Bom')
+        })
+        .catch(fail)
 })

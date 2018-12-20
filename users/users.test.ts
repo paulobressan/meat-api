@@ -123,6 +123,7 @@ test('patch /users/:id', () => {
         //Vamos encadear as promisse para que seja inserido e retorne uma promisse de alteração do PATCH
         .then(response => request(address)
             .patch(`/users/${response.body._id}`)
+            .set('Authorization', auth)
             .send({
                 name: 'usuario2 - patch'
             }))

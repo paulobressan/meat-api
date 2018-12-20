@@ -2,6 +2,7 @@ import 'jest'
 import * as request from 'supertest'
 
 const address: string = (<any>global).address
+const auth: string = (<any>global).auth
 
 test('get /restaurants', () => {
     return request(address)
@@ -15,6 +16,7 @@ test('get /restaurants', () => {
 test('post /restaurants', () => {
     return request(address)
         .post('/restaurants')
+        .set('Authorization', auth)
         .send({
             name: 'Restaurants Teste'
         })
@@ -28,12 +30,14 @@ test('post /restaurants', () => {
 test('patch /restaurants', () => {
     return request(address)
         .post('/restaurants')
+        .set('Authorization', auth)
         .send({
             name: 'Restaurants Teste'
         })
         .then(response =>
             request(address)
                 .patch(`/restaurants/${response.body._id}`)
+                .set('Authorization', auth)
                 .send({
                     name: 'Restaurants Teste 2'
                 }))
@@ -47,12 +51,14 @@ test('patch /restaurants', () => {
 test('patch /restaurants menu', () => {
     return request(address)
         .post('/restaurants')
+        .set('Authorization', auth)
         .send({
             name: 'Restaurants Teste'
         })
         .then(response =>
             request(address)
                 .put(`/restaurants/${response.body._id}/menu`)
+                .set('Authorization', auth)
                 .send({
                     name: 'X-TUDO',
                     price: 20
