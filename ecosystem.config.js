@@ -14,9 +14,12 @@ module.exports = {
       //usar o cluster quando a instance for 0, assim vai ser instanciado uma instancia master que vai balancear
       //os processos para as outras intancias
       exec_mode: "cluster",
+      //O watch é para o pm2 ficar escutando alterações no arquivo scrip main.js, quando tiver alteração
+      //Ele vai executar restart na aplicação
+      watch: true,
       //E as variaveis de ambiente que a aplicação vai conter, lembrando o arquivo environment.ts
       env: {
-        SERVER_PORT: 5000,
+        SERVER_PORT: 3000,
         DB_URL: 'mongodb://localhost/meat-api',
         //Variavel que define o ambiente que vai ser executado
         NODE_ENV: 'development'

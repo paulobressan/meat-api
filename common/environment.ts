@@ -18,6 +18,10 @@ export const environment = {
         //Caminho do arquivo de certificado
         certificate: process.env.CERTI_FILE || './security/keys/cert.pem',
         //Caminho do arquivo de certificado key
-        key: process.env.CERTI_KEY_FILE ||'./security/keys/key.pem'
+        key: process.env.CERTI_KEY_FILE || './security/keys/key.pem'
+    },
+    log: {
+        level: process.env.LOG_LEVEL || 'debug',
+        name: 'meat-api-logger'
     }
 }

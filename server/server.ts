@@ -14,6 +14,7 @@ import { handleError } from './error.handler';
 import { tokenParser } from '../security/token.parser';
 //Manipulador de arquivo do node (File System)
 import * as fs from 'fs';
+import { logger } from '../common/logger';
 
 //Configurando classe que vai iniciar o servidor
 export class Server {
@@ -44,7 +45,8 @@ export class Server {
                 //Opções para inicializar o servidor. É o objeto que a função createServer recebe
                 const options: restify.ServerOptions = {
                     name: 'meat-api',
-                    version: '1.0.0'
+                    version: '1.0.0',
+                    log: logger
                 }
 
                 //Se a certificação estiver ativa na environment, vamos adicionar na options
@@ -55,9 +57,15 @@ export class Server {
                     //key.pem é a chave de validação do certificado
                     options.key = fs.readFileSync(environment.security.key);
                 }
-                
+
                 //Configurando o servidor, configurações de criação do servidor
                 this.application = restify.createServer(options);
+
+                //request log, configurar log na requisição
+                //Toda vez que uma requisição for realizada, o requestLogger vai preparar o log do id dessa requisição para que os logs gerado por nós no código seja idenficado com o id da request
+                this.application.pre(restify.plugins.requestLogger({
+                    log: logger
+                }))
 
                 //Configurando um plugin para capturar os valores passado na url
                 this.application.use(restify.plugins.queryParser())

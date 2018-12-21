@@ -14,6 +14,7 @@ const error_handler_1 = require("./error.handler");
 const token_parser_1 = require("../security/token.parser");
 //Manipulador de arquivo do node (File System)
 const fs = require("fs");
+const logger_1 = require("../common/logger");
 //Configurando classe que vai iniciar o servidor
 class Server {
     //metodo que inicializa a conexão com mongo
@@ -38,7 +39,8 @@ class Server {
                 //Opções para inicializar o servidor. É o objeto que a função createServer recebe
                 const options = {
                     name: 'meat-api',
-                    version: '1.0.0'
+                    version: '1.0.0',
+                    log: logger_1.logger
                 };
                 //Se a certificação estiver ativa na environment, vamos adicionar na options
                 if (environment_1.environment.security.enableHTTPS) {
@@ -50,6 +52,11 @@ class Server {
                 }
                 //Configurando o servidor, configurações de criação do servidor
                 this.application = restify.createServer(options);
+                //request log, configurar log na requisição
+                //Toda vez que uma requisição for realizada, o requestLogger vai preparar o log do id dessa requisição para que os logs gerado por nós no código seja idenficado com o id da request
+                this.application.pre(restify.plugins.requestLogger({
+                    log: logger_1.logger
+                }));
                 //Configurando um plugin para capturar os valores passado na url
                 this.application.use(restify.plugins.queryParser());
                 //Configurando um plugin para converter o body em objetos json
