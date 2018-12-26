@@ -17,6 +17,9 @@ module.exports = {
       //O watch é para o pm2 ficar escutando alterações no arquivo scrip main.js, quando tiver alteração
       //Ele vai executar restart na aplicação
       watch: true,
+      //Os logs da aplicação é salvo em arquivo quebrados para cada instancia, para realizar o merge desses logs 
+      //em um unico arquivo temos que usar a configuração merge_logs
+      merge_logs: true,
       //E as variaveis de ambiente que a aplicação vai conter, lembrando o arquivo environment.ts
       env: {
         SERVER_PORT: 3000,

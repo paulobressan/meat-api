@@ -83,10 +83,25 @@ class Server {
                 });
                 //criando um evento para que ele fique escutando os erros da aplicação se houver vai ser chamado o callback handleErro criado para retornar um json
                 this.application.on('restifyError', error_handler_1.handleError);
+                //LOGS DE AUDITORIA
                 //Para verificar se houve error ao escutar o servidor em algumar porta, é necessario se inscrever no servidor
                 //e criar um evento de error para escutar se houver algum erro
                 // this.application.on('error', (err)=>{
                 //     console.log(err);
+                // })
+                //Configurando o audit logger
+                //Temos que tomar o cuidado com os logs de audit por conta que ele gera logs com dados sensiveis
+                // this.application.on('after', restify.plugins.auditLogger({
+                //     //Qual ferramenta que vamos usar para logar os logs audit
+                //     log: logger,
+                //     //Em qual momento vamos logar esse log
+                //     event: 'after',
+                //     //podemos logar tambem o body da requisição
+                //     body: true
+                // }))
+                // //Temos o evento audit que nele recebemos todos os dados para fazer o que quisermos
+                // this.application.on('audit', data => {
+                //     console.log(data)
                 // })
             }
             catch (error) {
