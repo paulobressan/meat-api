@@ -158,7 +158,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     delete = (req, resp, next) => {
         //como não queremos retornar nada depois que remover, podemos simplesmente usar o metodo remove
         //Se for preciso retorna podemos utilizar o metodo findByIdAndRemove
-        this.model.findOneAndDelete({ _id: req.params.id })
+        this.model.findOneAndRemove({ _id: req.params.id })
             .exec()
             .then(result => {
                 //Se o algum documento foi afetado

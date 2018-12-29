@@ -30,7 +30,7 @@ export class Server {
             //Indexar subdocumentos de coleções que tem sub documentos
             useCreateIndex: true,
             //Remover suporte a metodos descontinuada da aplicação no mongoose
-            useFindAndModify: false
+            useFindAndModify: false,
         })
     }
 
