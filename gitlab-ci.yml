@@ -1,0 +1,33 @@
+# Criar um stagio de execução de comandos
+stages:
+  - test
+
+# Cachear alguns estagios do build e execuções, por exemplo o node_modules para que todo commit não tenha que instalar
+# as dependencias novamente
+cache:
+  paths:
+    - node_modules/
+
+# O que o stagio de test defino acima faz
+test: #Não necessariamente o nome tem que ser test por que abaixo no stage: test que associamos com o stagio definido acima
+  #Associar o job test ao stagio test 
+  stage: test
+  #Executar esse job(test) dentro de um container DOCKER(imagem de um so)
+  #Como a imagem tem que ter algumas ferramentas instalada, como node para executar os testes, temos que
+  #procurar uma imagem pronta, no site hub docker com as ferramentas ja instalada
+  image: beevelop/nodejs-python
+  #url do mongo para nos conectar não é a mesma com a do arquivo de enviroment, porntanto vamos criar uma
+  #variavel de ambiente no container com a url do mongo
+  variable:
+      DB_URL: "mongodb://mongo/meat-api"
+      #Porta do servidor(Exemplo)
+      SERVER_PORT: 3001
+  #Usando um serviço que o gitlab fornece do mongod
+  services:
+    - mongo
+  #Executar comandos no container
+  script:
+    # instalar dependencias(sera cacheada)
+    - npm i
+    #executar tests(jest da aplicação)
+    - npm test

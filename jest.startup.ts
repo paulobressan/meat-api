@@ -59,4 +59,11 @@ const afterAllTests = () => {
 beforeAllTests()
     .then(() => jestCli.run())
     .then(() => afterAllTests())
-    .catch(console.error)
+    .catch(err => {
+        //Vamos logar o error
+        console.error(err)
+        //(GITLAB) Vamos avisar a quem executou que esta com problema
+        //Vamos finalizar o processo informando um erro(1)
+        process.exit(1)
+    })
+
