@@ -18,7 +18,7 @@ test: #Não necessariamente o nome tem que ser test por que abaixo no stage: tes
   image: beevelop/nodejs-python
   #url do mongo para nos conectar não é a mesma com a do arquivo de enviroment, porntanto vamos criar uma
   #variavel de ambiente no container com a url do mongo
-  variable:
+  variables:
       DB_URL: "mongodb://mongo/meat-api"
       #Porta do servidor(Exemplo)
       SERVER_PORT: 3001
