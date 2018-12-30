@@ -16,7 +16,7 @@ class UsersRouter extends ModelRouter<User> {
         //retorna os objetos para o cliente, assim podemos manipular o valor antes
         //que ele retorne
         this.on('beforeRender', document => {
-            document.password = undefined;
+            //document.password = undefined;
             //temos tambem
             //delete document.password;
         })
